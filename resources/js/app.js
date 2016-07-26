@@ -66,6 +66,10 @@ $("#playlist_default").click(function(){
 		});
 	}
 });
+
+$("#update").click(function(){
+	updater();
+});
 //----------------------
 
 
@@ -127,7 +131,10 @@ function YTdownloader(){
 				//----------------
 				convert2mp3(idvideo, function(result){
 					self.barProgress.back.html("Cancelar descarga");
-
+					//Quitamos el # cuando hay caracteres especiales
+					result[3] = result[3].replace("#", "");
+					//----------------------------------------------
+					
 					//Obtener nombre del archivo, si existen duplicados
 					var b = true;
 					var name = app.getPath("music")+"/"+result[3];
@@ -291,6 +298,7 @@ function Player(){
 	};
 
 	this.load = function(file, id_song){
+		console.log(file);
 		this.audioPlayer.get(0).src= file;
 		this.audioPlayer.get(0).load();
 		this.play();
