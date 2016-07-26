@@ -410,10 +410,11 @@ $(window).trigger('resize');
 function convert2mp3(t, callback){
 	$.get("http://api.convert2mp3.cc/check.php?api=true&v="+t+"&h="+Math.floor(35e5*Math.random()),function(t){
 		var o=t.split("|");
-		if(o[0]=="ERROR"){
-			console.log("Intentalo de nuevo");
-		}else{
+		if(o[0]=="OK"){
 			callback(o);
+		}else{
+			ytdownloader.barProgress.back.html("Intentalo de nuevo");
+			console.log("Intentalo de nuevo: ERROR API", o);
 			//console.log("http://dl"+o[1]+".downloader.space/dl.php?id="+o[2]);
 		}
 	});
