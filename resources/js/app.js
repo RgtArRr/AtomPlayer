@@ -3,9 +3,7 @@ var http = require('http');
 var sql = require('sql.js');
 var fs = require('fs');
 $ = jQuery = require("jquery");
-const {app} = require('electron').remote;
 const {dialog} = require('electron').remote;
-
 var db = new Database();
 db.init();
 

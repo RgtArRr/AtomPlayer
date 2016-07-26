@@ -1,4 +1,5 @@
 var sql = require('sql.js');
+const {app} = require('electron').remote;
 /*
 var fileDB = "resources/DB.sqlite";
 var db;
@@ -15,7 +16,7 @@ db.writeDB("CREATE TABLE libreta (id_libreta integer NOT NULL PRIMARY KEY AUTOIN
 
 function Database() {
   var self = this;
-  var fileDB = "resources/DB.sqlite";
+  var fileDB = app.getAppPath()+"/resources/db/DB.sqlite";
   this.db;
 
   this.init = function(){
