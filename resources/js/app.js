@@ -4,6 +4,8 @@ var sql = require('sql.js');
 var fs = require('fs');
 $ = jQuery = require("jquery");
 const {dialog} = require('electron').remote;
+const {clipboard} = require('electron');
+
 var db = new Database();
 db.init();
 
@@ -45,21 +47,24 @@ $("#download").click(function(){
 //Temporal Playlist event
 $("#playlist_default").click(function(){
 	$("#canciones").html("");
-	$.each(db.getSongs(1)[0].values, function(j,k){
-		var tr = createNode("tr");
-		var td1 = createNode("td");
-		var td2 = createNode("td");
-		var buttonPlay = createNode("button");
-		buttonPlay.html("Play");
-		buttonPlay.click(function(){
-			player.load("file:///"+k[2], k[0]);
+	var songs = db.getSongs(1);
+	if(songs[0]){
+		$.each(songs[0].values, function(j,k){
+			var tr = createNode("tr");
+			var td1 = createNode("td");
+			var td2 = createNode("td");
+			var buttonPlay = createNode("button");
+			buttonPlay.html("Play");
+			buttonPlay.click(function(){
+				player.load("file:///"+k[2], k[0]);
+			});
+			td1.append(k[1]);
+			td2.append(buttonPlay);
+			tr.append(td2);
+			tr.append(td1);
+			$("#canciones").append(tr);
 		});
-		td1.append(k[1]);
-		td2.append(buttonPlay);
-		tr.append(td2);
-		tr.append(td1);
-		$("#canciones").append(tr);
-	});
+	}
 });
 //----------------------
 
@@ -67,7 +72,7 @@ $("#playlist_default").click(function(){
 function YTdownloader(){
 	var self = this;
 	//Cambiar variable por URLinput
-	this.input = {div: createNode("div", {class: "form-group"}), label: createNode("label", {html: "Descargar musica en .mp3 de YouTube"}), input : createNode("input", {type: "email", class: "form-control", placeholder: "Copie un link de youtube aqui"})};
+	this.input = {div: createNode("div", {class: "form-group"}), label: createNode("label", {html: "Descargar musica en .mp3 de YouTube"}), input : createNode("input", {type: "text", class: "form-control", placeholder: "Copie un link de youtube aqui"})};
 	this.input.div.append(this.input.label);
 	this.input.div.append(this.input.input);
 
@@ -205,13 +210,13 @@ function YTdownloader(){
 function TableList(){
 	var self = this;
 
-	this.tableHeader = {head: createNode("table",{id: "canciones"}), body:  createNode("tr")};
+	this.tableHeader = {head: createNode("table"), body:  createNode("tr")};
 	this.tableHeader.head.append(this.tableHeader.body);
 	this.tableHeader.body.append(createNode("th"));
 	this.tableHeader.body.append(createNode("th", {html: "Nombre"}));
 	this.tableHeader.body.append(createNode("th", {html: "Duracion"}));
 
-	this.tableBody = {head: createNode("table", {class: "table-striped"}), body: createNode("tbody")};
+	this.tableBody = {head: createNode("table", {class: "table-striped"}), body: createNode("tbody", {id: "canciones"})};
 	this.tableBody.head.append(this.tableBody.body);
 
 	this.divContainer = createNode("div", {class: "table-wrapper fill"});
@@ -320,6 +325,31 @@ function Player(){
 		this.buttonPlay.icon.addClass("icon-play");
 	};
 }
+
+//-----------------------------------------------------
+var lastUrl = ""
+setInterval(function(){
+	if(clipboard.readText() != lastUrl){
+		var url = urlObject({"url" : clipboard.readText()});
+		var idvideo = null;
+		switch(url.hostname) {
+			case "www.youtube.com":
+			case "youtube.com":
+			idvideo = url.parameters["v"];
+			break;
+			case "www.youtu.be":
+			case "youtu.be":
+			idvideo = url.pathname.split("/")[1];
+			break;
+			default:
+		}
+		if(idvideo){
+			ytdownloader.input.input.val(clipboard.readText());
+			lastUrl = clipboard.readText();
+		}
+	}
+}, 1000);
+//-----------------------------------------------------
 
 //Utilidad para generar html
 function createNode(etiqueta, attr) {

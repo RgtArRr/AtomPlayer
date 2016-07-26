@@ -1,5 +1,5 @@
 function updater (){
-  var urlUpdater = "https://gist.githubusercontent.com/RgtArRr/9cb50d8158fda61e820d49d4959bb96a/raw/version.json";
+  var urlUpdater = "https://gist.github.com/RgtArRr/d6c66d7835a2abec85c5380c7fd8e98f/raw/version.json";
   var currentversion = require('./package.json').version;
   $.get(urlUpdater, function(data){
     var flag = false;
@@ -8,17 +8,17 @@ function updater (){
         $.each(k, function(jj,kk){
           if(kk.type === "add"){
             $.ajax({
-              url: "https://raw.githubusercontent.com/RgtArRr/libreta-electron/" + kk.url,
+              url: "https://raw.githubusercontent.com/RgtArRr/kPlayer/" + kk.url,
               type:  "GET",
               dataType: kk.dataType,
               processData: false,
               success: function(data){
-                fs.writeFileSync(process.resourcesPath + "/app/" + kk.file, data);
+                fs.writeFileSync(app.getAppPath() + kk.file, data);
               }
             });
           }
           if(kk.type === "remove"){
-            fs.unlinkSync(process.resourcesPath + "/app/" + kk.file);
+            fs.unlinkSync(app.getAppPath() + kk.file);
           }
         });
         flag = true;
@@ -32,6 +32,6 @@ function updater (){
     }
   }, "json")
   .fail(function() {
-    alert("Hubo un error al actualizar, intentalo mas tarde.");
+    alert("Hubo un error al actualizar, intentalo mas tarde. Puede que no tengas internet -.-");
   });
 };
