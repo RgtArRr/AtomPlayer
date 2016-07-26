@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Ken Player</title>
+  <link rel="stylesheet" href="resources/bootstrap.gridSystem.min.css">
+  <link rel="stylesheet" href="resources/photon.min.css">
+  <link rel="stylesheet" href="resources/styles.css">
+  <link rel="stylesheet" href="resources/circle.css">
+  <script src="resources/menu.js" charset="utf-8"></script>
+</head>
+<body>
+  <div class="window">
+    <div class="window">
+      <header class="toolbar toolbar-header">
+        <h1 class="title">Player</h1>
+        <div class="toolbar-actions">
+          <div class="btn-group">
+            <button class="btn btn-default" id="home">
+              <span class="icon icon-home"></span>
+            </button>
+            <button class="btn btn-default" id="add_Song">
+              <span class="icon icon-folder"></span>
+            </button>
+            <button class="btn btn-default" id="download">
+              <span class="icon icon-download"></span>
+            </button>
+          </div>
+        </div>
+      </header>
+      <div class="window-content">
+        <div class="pane-group">
+          <div class="pane pane-sm sidebar">
+            <nav class="nav-group">
+              <h5 class="nav-group-title">PlayList</h5>
+              <a class="nav-group-item active" id="playlist_default">
+                <span class="icon icon-home"></span>
+                Default
+              </a>
+            </nav>
+          </div>
+          <div class="pane" id="screen">
+
+          </div>
+        </div>
+      </div>
+
+      <footer class="toolbar toolbar-footer">
+        <div class="toolbar-actions player">
+        </div>
+      </div>
+    </footer>
+  </div>
+  <script type="text/javascript" src="resources/database.js"></script>
+  <script type="text/javascript" src="resources/app.js"></script>
+</body>
+</html>
