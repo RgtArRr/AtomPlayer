@@ -45,17 +45,25 @@ td {
 .player{
   font-size: 24px;
   margin: 0px 20px 0px 20px;
+  height: 15px;
 }
 
-.hp_slide{
-  width:100%;
-  background:white;
-  height:3px;
+#progress_song{
+  font-size: 12px;
+  height: 5px;
+  padding-left: 0px;
 }
-.hp_range{
-  width:0;
-  background:black;
-  height:3px;
+
+#progress_song li{
+  display: inline;
+  list-style-type: none;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+.song_title{
+  padding-left: 10px;
+  font-size: 18px;
 }
 
 .ytdownloadercontainer{

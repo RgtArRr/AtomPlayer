@@ -56,7 +56,7 @@ $("#playlist_default").click(function(){
 			var buttonPlay = createNode("button");
 			buttonPlay.html("Play");
 			buttonPlay.click(function(){
-				player.load("file:///"+k[2], k[0]);
+				player.load("file:///"+k[2], k[0], k[1]);
 			});
 			td1.append(k[1]);
 			td2.append(buttonPlay);
@@ -134,7 +134,7 @@ function YTdownloader(){
 					//Quitamos el # cuando hay caracteres especiales
 					result[3] = result[3].replace("#", "");
 					//----------------------------------------------
-					
+
 					//Obtener nombre del archivo, si existen duplicados
 					var b = true;
 					var name = app.getPath("music")+"/"+result[3];
@@ -243,7 +243,8 @@ function Player(){
 	var self = this;
 
 	this.lastIdSong = 0;
-	this.audioPlayer = createNode("audio", false);
+	this.seekPlayer = {status: 0}
+	this.audioPlayer = createNode("audio", {id: "player-audio"});
 
 	this.buttonPrevious = {button: createNode("button", {class: "btn"}), icon: createNode("span", {class: "icon icon-to-start"})};
 	this.buttonPrevious.button.html(this.buttonPrevious.icon);
@@ -254,14 +255,31 @@ function Player(){
 	this.buttonNext = {button: createNode("button", {class: "btn"}), icon: createNode("span", {class: "icon icon-to-end"})};
 	this.buttonNext.button.html(this.buttonNext.icon);
 
-	this.progressBar = {button: createNode("button", {class: "btn"}), divContainer: createNode("div", {class: "hp_slide"}), divChild: createNode("div", {class: "hp_range"})};
-	this.progressBar.button.html(this.progressBar.divContainer);
-	this.progressBar.divContainer.html(this.progressBar.divChild);
+	this.songTitle = createNode("span", {class: "song_title"});
+
+	this.progressBar = {container: createNode("ul", {id: "progress_song"}), currentTime: createNode("li", {html : "0:00"}), totalTime: createNode("li", {html : "-:-"}), progress : createNode("progress", {value: 0, max: 1, style: "width: 90%"})};
+	this.progressBar.container.append(this.progressBar.currentTime);
+	this.progressBar.container.append(this.progressBar.progress);
+	this.progressBar.container.append(this.progressBar.totalTime);
 
 	this.draw = function (element){
 
+		this.audioPlayer.bind("loadedmetadata", function(e){
+			self.progressBar.totalTime.html(sectostr(Math.round(e.target.duration)));
+		});
+
 		this.audioPlayer.bind("timeupdate", function(e){
-			self.progressBar.divChild.stop(true,true).animate({'width':(e.target.currentTime)/e.target.duration*100+'%'},250,'linear');
+			if(self.seekPlayer.status == 1){
+				self.audioPlayer.get(0).currentTime = self.seekPlayer.value * this.duration;
+				self.seekPlayer = {status : 0};
+			}
+			self.progressBar.progress.attr("value", this.currentTime / this.duration);
+			self.progressBar.currentTime.html(sectostr(Math.round(this.currentTime)));
+		});
+
+		this.progressBar.progress.click(function(e){
+			var percent = e.offsetX / this.offsetWidth;
+			self.seekPlayer = {status: 1, value: percent};
 		});
 
 		this.audioPlayer.bind("ended", function(e){
@@ -289,26 +307,26 @@ function Player(){
 		this.buttonNext.button.click(function(){
 			self.nextSong();
 		});
-
+		$(".player").append(this.progressBar.container);
 		$(".player").append(this.buttonPrevious.button);
 		$(".player").append(this.buttonPlay.button);
 		$(".player").append(this.buttonNext.button);
-		$(".player").append(this.progressBar.divContainer);
+		$(".player").append(this.songTitle);
 		element.append(this.audioPlayer);
 	};
 
-	this.load = function(file, id_song){
-		console.log(file);
+	this.load = function(file, id_song, title){
 		this.audioPlayer.get(0).src= file;
 		this.audioPlayer.get(0).load();
 		this.play();
 		this.lastIdSong = id_song;
+		this.songTitle.html(title);
 	};
 
 	this.nextSong = function(){
 		var song = db.getNextSong(self.lastIdSong);
 		if(song[0]){
-			this.load(song[0].values[0][2], song[0].values[0][0]);
+			this.load(song[0].values[0][2], song[0].values[0][0], song[0].values[0][1]);
 			console.log("Siguiente cancion");
 		}
 	};
@@ -316,7 +334,7 @@ function Player(){
 	this.previousSong = function(){
 		var song = db.getPreviousSong(self.lastIdSong);
 		if(song[0]){
-			this.load(song[0].values[0][2], song[0].values[0][0]);
+			this.load(song[0].values[0][2], song[0].values[0][0], song[0].values[0][1]);
 			console.log("Siguiente Anterior");
 		}
 	}
@@ -542,6 +560,10 @@ function timeSince(date) {
 	} else {
 		return date.getDate().toString() + " " + months[date.getMonth()] + ", " + date.getFullYear();
 	}
+}
+
+function sectostr(time) {
+	return ~~(time / 60) + ":" + (time % 60 < 10 ? "0" : "") + time % 60;
 }
 
 
