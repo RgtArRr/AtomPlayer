@@ -42,7 +42,7 @@ function Database() {
   };
 
   this.getPreviousSong = function(id_song){
-    return this.readDB("select * from cancion where id_cancion < " + id_song + " and id_playlist = (select id_playlist from cancion where id_cancion="+id_song+") limit 1");
+    return this.readDB("select * from cancion where id_cancion < " + id_song + " and id_playlist = (select id_playlist from cancion where id_cancion="+id_song+") order by  id_cancion desc limit 1");
   };
 
   this.getRandomSong = function(id_song){

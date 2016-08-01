@@ -463,7 +463,7 @@ function Player(){
 
 	this.nextSong = function(){
 		var song;
-		if(self.buttonShuffle.button.hasClass("active")){
+		if(self.buttonShuffle.button.hasClass("btn-active")){
 			song = db.getRandomSong(self.lastIdSong);
 		} else {
 			var tempsong = db.getNextSong(self.lastIdSong);
@@ -480,7 +480,7 @@ function Player(){
 
 	this.previousSong = function(){
 		var song;
-		if(self.buttonShuffle.button.hasClass("active")){
+		if(self.buttonShuffle.button.hasClass("btn-active")){
 			song = db.getRandomSong(self.lastIdSong);
 		} else {
 			var tempsong = db.getPreviousSong(self.lastIdSong);
