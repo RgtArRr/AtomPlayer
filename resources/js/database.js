@@ -43,7 +43,12 @@ function Database() {
 
   this.getPreviousSong = function(id_song){
     return this.readDB("select * from cancion where id_cancion < " + id_song + " and id_playlist = (select id_playlist from cancion where id_cancion="+id_song+") limit 1");
-  }
+  };
+
+  this.getRandomSong = function(id_song){
+    var rows = this.readDB("select * from cancion where id_playlist = (select id_playlist from cancion where id_cancion="+id_song+")");
+    return rows[0].values[Math.floor(Math.random() * rows[0].values.length)];
+  };
 
   this.writeDB = function (query) {
     var res = this.db.exec(query);

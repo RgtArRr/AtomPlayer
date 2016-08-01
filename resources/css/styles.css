@@ -48,6 +48,17 @@ td {
   height: 15px;
 }
 
+.active{
+  color:#fff;
+  border:1px solid transparent;
+  background-color:#6d6c6d;
+  background-image:none
+}
+
+.active .icon{
+  color: #fff;
+}
+
 #progress_song{
   font-size: 12px;
   height: 5px;

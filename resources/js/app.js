@@ -255,6 +255,9 @@ function Player(){
 	this.buttonNext = {button: createNode("button", {class: "btn"}), icon: createNode("span", {class: "icon icon-to-end"})};
 	this.buttonNext.button.html(this.buttonNext.icon);
 
+	this.buttonShuffle = {button: createNode("button", {class: "btn"}), icon: createNode("span", {class: "icon icon-shuffle"})};
+	this.buttonShuffle.button.html(this.buttonShuffle.icon);
+
 	this.songTitle = createNode("span", {class: "song_title"});
 
 	this.progressBar = {container: createNode("ul", {id: "progress_song"}), currentTime: createNode("li", {html : "0:00"}), totalTime: createNode("li", {html : "-:-"}), progress : createNode("progress", {value: 0, max: 1, style: "width: 90%"})};
@@ -307,10 +310,20 @@ function Player(){
 		this.buttonNext.button.click(function(){
 			self.nextSong();
 		});
+
+		this.buttonShuffle.button.click(function(){
+			if(self.buttonShuffle.button.hasClass("active")){
+				self.buttonShuffle.button.removeClass("active");
+			}else{
+				self.buttonShuffle.button.addClass("active");
+			}
+		});
+
 		$(".player").append(this.progressBar.container);
 		$(".player").append(this.buttonPrevious.button);
 		$(".player").append(this.buttonPlay.button);
 		$(".player").append(this.buttonNext.button);
+		$(".player").append(this.buttonShuffle.button);
 		$(".player").append(this.songTitle);
 		element.append(this.audioPlayer);
 	};
@@ -324,17 +337,35 @@ function Player(){
 	};
 
 	this.nextSong = function(){
-		var song = db.getNextSong(self.lastIdSong);
-		if(song[0]){
-			this.load(song[0].values[0][2], song[0].values[0][0], song[0].values[0][1]);
+		var song;
+		if(self.buttonShuffle.button.hasClass("active")){
+			song = db.getRandomSong(self.lastIdSong);
+		} else {
+			var tempsong = db.getNextSong(self.lastIdSong);
+			if(tempsong[0]){
+				song = tempsong[0].values[0];
+			}
+		}
+
+		if(song){
+			this.load(song[2], song[0], song[1]);
 			console.log("Siguiente cancion");
 		}
 	};
 
 	this.previousSong = function(){
-		var song = db.getPreviousSong(self.lastIdSong);
+		var song;
+		if(self.buttonShuffle.button.hasClass("active")){
+			song = db.getRandomSong(self.lastIdSong);
+		} else {
+			song = db.getPreviousSong(self.lastIdSong);
+			if(tempsong[0]){
+				song = tempsong[0].values[0];
+			}
+		}
+
 		if(song[0]){
-			this.load(song[0].values[0][2], song[0].values[0][0], song[0].values[0][1]);
+			this.load(song[2], song[0], song[1]);
 			console.log("Siguiente Anterior");
 		}
 	}
