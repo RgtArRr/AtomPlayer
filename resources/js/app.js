@@ -5,6 +5,7 @@ var fs = require('fs');
 $ = jQuery = require("jquery");
 const {dialog} = require('electron').remote;
 const {clipboard} = require('electron');
+const ipcRenderer = require('electron').ipcRenderer
 
 var db = new Database();
 db.init();
@@ -20,19 +21,22 @@ ytdownloader.draw($("#screen"));
 
 $("#add_Song").click(function(){
 	dialog.showOpenDialog({title: "Escoge una musica",  filters: [{name: 'Canciones', extensions: ['mp3']},]}, function(e){
+		alert("Comming soon");
+		/*
 		var tr = createNode("tr");
 		var td1 = createNode("td");
 		var td2 = createNode("td");
 		var buttonPlay = createNode("button");
 		buttonPlay.html("Play");
 		buttonPlay.click(function(){
-			player.load("file:///"+e[0]);
+		player.load("file:///"+e[0]);
 		});
 		td1.append(e[0].split("\\")[e[0].split("\\").length-1]);
 		td2.append(buttonPlay);
 		tr.append(td2);
 		tr.append(td1);
 		$("#canciones").append(tr);
+		*/
 	});
 });
 
@@ -45,23 +49,68 @@ $("#download").click(function(){
 });
 
 //Temporal Playlist event
+//******
+var menu = null;
+//------
+
 $("#playlist_default").click(function(){
 	$("#canciones").html("");
 	var songs = db.getSongs(1);
 	if(songs[0]){
 		$.each(songs[0].values, function(j,k){
 			var tr = createNode("tr");
-			var td1 = createNode("td");
-			var td2 = createNode("td");
-			var buttonPlay = createNode("button");
-			buttonPlay.html("Play");
-			buttonPlay.click(function(){
+			var td1 = createNode("td", {style: "width:80%;"});
+			var td2 = createNode("td", {style: "width:20%; text-align: left;"});
+			if(k[1].length > 63){
+				k[1] = k[1].substr(0, 63) + "...";
+			}
+			td1.html(k[1]);
+			td2.html(sectostr(k[3]));
+			tr.append(td1);
+			tr.append(td2);
+			tr.dblclick(function(){
 				player.load("file:///"+k[2], k[0], k[1]);
 			});
-			td1.append(k[1]);
-			td2.append(buttonPlay);
-			tr.append(td2);
-			tr.append(td1);
+			tr.contextmenu(function(e) {
+				e.preventDefault();
+				if(menu){
+					menu.destroy();
+				}
+				menu = new ContextMenu();
+				menu.draw(e,
+					//Play
+					function(){
+						player.load("file:///"+k[2], k[0], k[1]);
+					},
+					//Delete
+					function(){
+						if(confirm("Estas seguro que quieres eliminar la cancion?")){
+							if(confirm("Eliminar tambien el archivo?")){
+								fs.unlink(k[2], function(err){
+									if(err) return console.log(err);
+								});
+							}
+							db.deleteSong(k[0]);
+							//Delete dom element
+							tr.remove();
+							//-----------------
+						}
+					},
+					//renameCallback
+					function(){
+						var newName = prompt("Cambiar de nombre", k[1]);
+						if(newName != null){
+							db.updateNameSong(k[0], newName);
+							if(newName.length > 63){
+								newName = newName.substr(0, 63) + "...";
+							}
+							k[1] = newName;
+							td1.html(newName);
+						}
+					}
+				);
+			});
+			tr.data("id_song", k[0]);
 			$("#canciones").append(tr);
 		});
 	}
@@ -70,7 +119,72 @@ $("#playlist_default").click(function(){
 $("#update").click(function(){
 	updater();
 });
+
+$("html").on("click", function(){
+	if(menu){
+		menu.destroy();
+	}
+});
 //----------------------
+
+
+function ContextMenu(){
+	var self = this;
+
+	this.menu = createNode("div", {class: "menu"});
+	this.ul = createNode("ul");
+	this.itemPlay = createNode("li", {html: "Play"});
+	this.itemAddToPlayList = createNode("li", {html: "Add to PlayList (Soon)"});
+	this.itemRename = createNode("li", {html: "Rename"});
+	this.itemDelete = createNode("li", {html: "Delete"});
+
+	this.ul.append(this.itemPlay);
+	this.ul.append(this.itemAddToPlayList);
+	this.ul.append(this.itemRename);
+	this.ul.append(this.itemDelete);
+	this.menu.append(this.ul);
+
+
+	this.draw = function(event, playCallback, deleteCallback, renameCallback){
+		var pageX = event.pageX;
+		var pageY = event.pageY;
+		this.menu.css({top: pageY , left: pageX});
+
+		var mwidth = this.menu.width();
+		var mheight = this.menu.height();
+		var screenWidth = $(window).width();
+		var screenHeight = $(window).height();
+		var scrTop = $(window).scrollTop();
+		if(pageX+mwidth > screenWidth){
+			this.menu.css({left:pageX-mwidth});
+		}
+		if(pageY+mheight > screenHeight+scrTop){
+			this.menu.css({top:pageY-mheight});
+		}
+
+		this.itemPlay.click(function(){
+			playCallback();
+		});
+
+		this.itemDelete.click(function(){
+			deleteCallback();
+		});
+
+		this.itemRename.click(function(){
+			renameCallback();
+		});
+
+		this.itemAddToPlayList.click(function(){
+			//Soon
+		});
+
+		$("body").append(this.menu);
+	}
+
+	this.destroy = function(){
+		this.menu.remove();
+	}
+}
 
 
 function YTdownloader(){
@@ -219,9 +333,8 @@ function TableList(){
 
 	this.tableHeader = {head: createNode("table"), body:  createNode("tr")};
 	this.tableHeader.head.append(this.tableHeader.body);
-	this.tableHeader.body.append(createNode("th"));
-	this.tableHeader.body.append(createNode("th", {html: "Nombre"}));
-	this.tableHeader.body.append(createNode("th", {html: "Duracion"}));
+	this.tableHeader.body.append(createNode("th", {html: "Nombre", style: "width: 80%"}));
+	this.tableHeader.body.append(createNode("th", {html: "Duracion", style: "width: 20%"}));
 
 	this.tableBody = {head: createNode("table", {class: "table-striped"}), body: createNode("tbody", {id: "canciones"})};
 	this.tableBody.head.append(this.tableBody.body);
@@ -268,7 +381,15 @@ function Player(){
 	this.draw = function (element){
 
 		this.audioPlayer.bind("loadedmetadata", function(e){
-			self.progressBar.totalTime.html(sectostr(Math.round(e.target.duration)));
+			var duration = Math.round(e.target.duration);
+			db.updateDuratioSong(self.lastIdSong, duration);
+			//Update doom
+			$.each($("#canciones").find("tr"), function(j,k){
+				if($(k).data("id_song") == self.lastIdSong){
+					$($(k).find("td")[1]).html(sectostr(duration));
+				}
+			});
+			self.progressBar.totalTime.html(sectostr(duration));
 		});
 
 		this.audioPlayer.bind("timeupdate", function(e){
@@ -312,11 +433,7 @@ function Player(){
 		});
 
 		this.buttonShuffle.button.click(function(){
-			if(self.buttonShuffle.button.hasClass("active")){
-				self.buttonShuffle.button.removeClass("active");
-			}else{
-				self.buttonShuffle.button.addClass("active");
-			}
+			self.buttonShuffle.button.toggleClass("btn-active");
 		});
 
 		$(".player").append(this.progressBar.container);
@@ -334,6 +451,14 @@ function Player(){
 		this.play();
 		this.lastIdSong = id_song;
 		this.songTitle.html(title);
+
+		//Each song elements for highlight current song
+		$.each($("#canciones").find("tr"), function(j,k){
+			$(k).removeClass("currentSong");
+			if($(k).data("id_song") == id_song){
+				$(k).addClass("currentSong");
+			}
+		});
 	};
 
 	this.nextSong = function(){
@@ -358,13 +483,13 @@ function Player(){
 		if(self.buttonShuffle.button.hasClass("active")){
 			song = db.getRandomSong(self.lastIdSong);
 		} else {
-			song = db.getPreviousSong(self.lastIdSong);
+			var tempsong = db.getPreviousSong(self.lastIdSong);
 			if(tempsong[0]){
 				song = tempsong[0].values[0];
 			}
 		}
 
-		if(song[0]){
+		if(song){
 			this.load(song[2], song[0], song[1]);
 			console.log("Siguiente Anterior");
 		}

@@ -50,7 +50,28 @@ function Database() {
     return rows[0].values[Math.floor(Math.random() * rows[0].values.length)];
   };
 
-  this.writeDB = function (query) {
+  this.updateNameSong = function(id_song, newName){
+    this.writeDB("UPDATE cancion SET nombre = ? WHERE id_cancion = ?", [newName, id_song]);
+  };
+
+  this.updateDuratioSong = function(id_song, duration){
+    var row = this.readDB("SELECT * FROM cancion WHERE id_cancion = '" + id_song + "'");
+    if(row[0].values[0][3] == 0){
+      this.writeDB("UPDATE cancion SET duracion = ? WHERE id_cancion = ?", [duration, id_song]);
+    }
+  };
+
+  this.deleteSong = function(id_song){
+    this.writeDB("DELETE FROM cancion where id_cancion = '" + id_song + "'");
+  };
+
+  this.writeDB = function (query, values) {
+    var res = null;
+    if(values){
+      this.db.run(query, values);
+    }else{
+        var res = this.db.exec(query);
+    }
     var res = this.db.exec(query);
     var data = this.db.export();
     var buffer = new Buffer(data);

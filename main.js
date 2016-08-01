@@ -4,6 +4,8 @@ const {app} = electron;
 // Module to create native browser window.
 const {BrowserWindow} = electron;
 
+const ipcMain = electron.ipcMain
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
@@ -24,6 +26,34 @@ function createWindow() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     win = null;
+  });
+
+  //support prompt()
+  var promptResponse;
+  ipcMain.on('prompt', function(eventRet, arg) {
+    promptResponse = null;
+    var promptWindow = new BrowserWindow({
+      width: 400,
+      height: 100,
+      show: false,
+      resizable: false,
+      movable: false,
+      alwaysOnTop: true,
+      frame: false
+    });
+    arg.val = arg.val || '';
+    const promptHtml = '<label for="val">' + arg.title + '</label><input id="val" value="' + arg.val + '" autofocus /><button onclick="require(\'electron\').ipcRenderer.send(\'prompt-response\', document.getElementById(\'val\').value);window.close()">Aceptar</button><button onclick="window.close()">Cancelar</button><style>body {font-family: sans-serif;} button {float:right; margin-left: 10px;} label,input {margin-bottom: 10px; width: 100%; display:block;}</style>';
+    promptWindow.loadURL('data:text/html,' + promptHtml);
+    promptWindow.show();
+    promptWindow.on('closed', function() {
+      eventRet.returnValue = promptResponse;
+      promptWindow = null;
+    });
+  });
+
+  ipcMain.on('prompt-response', function(event, arg) {
+    if (arg === ''){ arg = null }
+    promptResponse = arg;
   });
 }
 
@@ -49,5 +79,22 @@ app.on('activate', () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+//For experimental features
+var options = [
+  //'enable-tcp-fastopen',
+  //'enable-experimental-canvas-features',
+  'enable-experimental-web-platform-features',
+  //'enable-overlay-scrollbars',
+  //'enable-hardware-overlays',
+  //'enable-universal-accelerated-overflow-scroll',
+  //'allow-file-access-from-files',
+  //'allow-insecure-websocket-from-https-origin',
+  ['js-flags', '--harmony_collections']
+];
+
+for(var i=0; i < options.length; ++i) {
+  if (typeof options[i] === 'string')
+  app.commandLine.appendSwitch(options[i]);
+  else
+  app.commandLine.appendSwitch(options[i][0], options[i][1]);
+}

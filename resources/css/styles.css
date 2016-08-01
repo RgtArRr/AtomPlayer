@@ -41,6 +41,15 @@ td {
   width: 100%;
   overflow: hidden;
 }
+.currentSong{
+  background: #4B95E5 !important;
+  color: #EDF4FC;
+}
+
+.table-striped tr:active:nth-child(even), tr:active{
+  background-color: #C2D1E0;
+  color: #222;
+}
 
 .player{
   font-size: 24px;
@@ -48,14 +57,14 @@ td {
   height: 15px;
 }
 
-.active{
+.btn-active{
   color:#fff;
   border:1px solid transparent;
   background-color:#6d6c6d;
   background-image:none
 }
 
-.active .icon{
+.btn-active .icon{
   color: #fff;
 }
 
@@ -76,6 +85,43 @@ td {
   padding-left: 10px;
   font-size: 18px;
 }
+
+.menu{
+  width: 171px;
+  backdrop-filter: blur(4px);
+  background: transparent;
+  color: #fff;
+  position:absolute;
+  z-index: 999999;
+  border-radius: 0px 8px 8px 8px;
+  box-shadow: 0 0 5px black;
+}
+.menu ul{
+  list-style: none;
+  padding: 0;
+  margin:0;
+}
+.menu ul a{
+  text-decoration: none;
+}
+
+ul > li:first-child {
+  border-radius: 8px 8px 0px 0px;
+}
+
+ul > li:last-child {
+  border-radius: 0px 0px 8px 8px;
+}
+
+.menu ul li{
+  padding: 3%;
+  padding-left: 20px;
+  color: #111;
+}
+.menu ul li:hover{
+  background-color: #8e909266;
+}
+
 
 .ytdownloadercontainer{
   margin: 0 auto;
