@@ -72,7 +72,6 @@ function Database() {
     }else{
         var res = this.db.exec(query);
     }
-    var res = this.db.exec(query);
     var data = this.db.export();
     var buffer = new Buffer(data);
     fs.writeFile(fileDB, buffer);
