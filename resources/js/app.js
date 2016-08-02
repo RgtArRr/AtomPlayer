@@ -356,6 +356,7 @@ function Player(){
 	var self = this;
 
 	this.lastIdSong = 0;
+	this.lastVolume = 0;
 	this.seekPlayer = {status: 0}
 	this.audioPlayer = createNode("audio", {id: "player-audio"});
 
@@ -371,6 +372,11 @@ function Player(){
 	this.buttonShuffle = {button: createNode("button", {class: "btn"}), icon: createNode("span", {class: "icon icon-shuffle"})};
 	this.buttonShuffle.button.html(this.buttonShuffle.icon);
 
+	this.buttonVolume = {button: createNode("button", {class: "btn"}), icon: createNode("span", {class: "icon icon-sound"}), range: createNode("input", {class: "volumen_range", type: "range", min: "0", max: "1", value: "1", step: "0.1"})};
+	this.buttonVolume.button.append(this.buttonVolume.icon);
+	this.buttonVolume.button.append(this.buttonVolume.range);
+	this.buttonVolume.range.hide();
+
 	this.songTitle = createNode("span", {class: "song_title"});
 
 	this.progressBar = {container: createNode("ul", {id: "progress_song"}), currentTime: createNode("li", {html : "0:00"}), totalTime: createNode("li", {html : "-:-"}), progress : createNode("progress", {value: 0, max: 1, style: "width: 90%"})};
@@ -379,7 +385,6 @@ function Player(){
 	this.progressBar.container.append(this.progressBar.totalTime);
 
 	this.draw = function (element){
-
 		this.audioPlayer.bind("loadedmetadata", function(e){
 			var duration = Math.round(e.target.duration);
 			db.updateDuratioSong(self.lastIdSong, duration);
@@ -432,6 +437,44 @@ function Player(){
 			self.nextSong();
 		});
 
+		this.buttonVolume.icon.click(function(){
+			self.buttonVolume.icon.toggleClass("icon-sound");
+			self.buttonVolume.icon.toggleClass("icon-mute");
+			if(self.lastVolume != 0){
+				self.audioPlayer.get(0).volume = self.lastVolume;
+				self.buttonVolume.range.val(self.lastVolume);
+				self.lastVolume = 0;
+			}else{
+				self.lastVolume = self.audioPlayer.get(0).volume;
+				self.audioPlayer.get(0).volume = 0;
+				self.buttonVolume.range.val(0);
+			}
+		});
+
+		this.buttonVolume.button.hover(
+	    function () {
+	      self.buttonVolume.range.show();
+	    },
+	    function () {
+	      self.buttonVolume.range.hide();
+	    }
+	  );
+
+		this.buttonVolume.range.on("change mousemove", function(e){
+			if(self.buttonVolume.icon.hasClass("icon-sound")){
+				if(self.lastVolume != e.target.value){
+					self.audioPlayer.get(0).volume = e.target.value;
+					self.lastVolume = e.target.value;
+				}
+			}
+		});
+
+		this.buttonVolume.range.mouseout(function(){
+			if(self.buttonVolume.icon.hasClass("icon-sound")){
+				self.lastVolume = 0;
+			}
+		});
+
 		this.buttonShuffle.button.click(function(){
 			self.buttonShuffle.button.toggleClass("btn-active");
 		});
@@ -441,6 +484,7 @@ function Player(){
 		$(".player").append(this.buttonPlay.button);
 		$(".player").append(this.buttonNext.button);
 		$(".player").append(this.buttonShuffle.button);
+		$(".player").append(this.buttonVolume.button);
 		$(".player").append(this.songTitle);
 		element.append(this.audioPlayer);
 	};
