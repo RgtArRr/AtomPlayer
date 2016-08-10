@@ -247,6 +247,8 @@ function YTdownloader(){
 					self.barProgress.back.html("Cancelar descarga");
 					//Quitamos el # cuando hay caracteres especiales
 					result[3] = result[3].replace("#", "");
+					//Sacamos todos los caracteres que Windows no permite
+					result[3] = result[3].replace("/","").replace("\\","").replace(":","").replace("*","").replace("?","").replace("\"","").replace("|","").replace("<","").replace(">","").replace("?","");
 					//----------------------------------------------
 
 					//Obtener nombre del archivo, si existen duplicados
