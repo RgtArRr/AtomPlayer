@@ -30,14 +30,14 @@ $("#add_Song").click(function(){
 		buttonPlay.html("Play");
 		buttonPlay.click(function(){
 		player.load("file:///"+e[0]);
-		});
-		td1.append(e[0].split("\\")[e[0].split("\\").length-1]);
-		td2.append(buttonPlay);
-		tr.append(td2);
-		tr.append(td1);
-		$("#canciones").append(tr);
-		*/
 	});
+	td1.append(e[0].split("\\")[e[0].split("\\").length-1]);
+	td2.append(buttonPlay);
+	tr.append(td2);
+	tr.append(td1);
+	$("#canciones").append(tr);
+	*/
+});
 });
 
 $("#home").click(function(){
@@ -46,6 +46,10 @@ $("#home").click(function(){
 
 $("#download").click(function(){
 	toogleView("ytdownload");
+});
+
+$("#minimize").click(function(){
+	ipcRenderer.sendSync('toogleMode', {});
 });
 
 //Temporal Playlist event
@@ -115,6 +119,9 @@ $("#playlist_default").click(function(){
 		});
 	}
 });
+
+//Load playlist rdy
+//$("#playlist_default").click();
 
 $("#update").click(function(){
 	updater();
@@ -379,6 +386,9 @@ function Player(){
 	this.buttonVolume.button.append(this.buttonVolume.range);
 	this.buttonVolume.range.hide();
 
+	this.buttonMaximize = {button: createNode("button", {class: "btn maximize", style: "display: none;"}), icon: createNode("span", {class: "icon icon-window"})};
+	this.buttonMaximize.button.append(this.buttonMaximize.icon);
+
 	this.songTitle = createNode("span", {class: "song_title"});
 
 	this.progressBar = {container: createNode("ul", {id: "progress_song"}), currentTime: createNode("li", {html : "0:00"}), totalTime: createNode("li", {html : "-:-"}), progress : createNode("progress", {value: 0, max: 1, style: "width: 90%"})};
@@ -454,13 +464,13 @@ function Player(){
 		});
 
 		this.buttonVolume.button.hover(
-	    function () {
-	      self.buttonVolume.range.show();
-	    },
-	    function () {
-	      self.buttonVolume.range.hide();
-	    }
-	  );
+			function () {
+				self.buttonVolume.range.show();
+			},
+			function () {
+				self.buttonVolume.range.hide();
+			}
+		);
 
 		this.buttonVolume.range.on("change mousemove", function(e){
 			if(self.buttonVolume.icon.hasClass("icon-sound")){
@@ -481,12 +491,18 @@ function Player(){
 			self.buttonShuffle.button.toggleClass("btn-active");
 		});
 
+		this.buttonMaximize.button.click(function(){
+			ipcRenderer.sendSync('toogleMode', {});
+		})
+
 		$(".player").append(this.progressBar.container);
+
 		$(".player").append(this.buttonPrevious.button);
 		$(".player").append(this.buttonPlay.button);
 		$(".player").append(this.buttonNext.button);
 		$(".player").append(this.buttonShuffle.button);
 		$(".player").append(this.buttonVolume.button);
+		$(".player").append(this.buttonMaximize.button);
 		$(".player").append(this.songTitle);
 		element.append(this.audioPlayer);
 	};

@@ -12,7 +12,7 @@ let win;
 
 function createWindow() {
   // Create the browser window.
-  win = new BrowserWindow({icon: __dirname + '/icono.ico', width: 800, height: 600, frame: false, minWidth: 400, minHeight: 300});
+  win = new BrowserWindow({icon: __dirname + '/icono.ico', width: 800, height: 600, frame: false, resizable: false});
 
   // and load the index.html of the app.
   win.loadURL(`file://${__dirname}/index.html`);
@@ -26,6 +26,21 @@ function createWindow() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     win = null;
+  });
+
+  //Toogle Basic and full mode
+  ipcMain.on('toogleMode', function(eventRet, arg) {
+    const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
+    if(win.getSize()[0] == 800 && win.getSize()[1] == 600){
+      win.setSize(386, 75, true);
+      win.setAlwaysOnTop(true);
+      win.setPosition(width-386, height-75);
+    }else{
+      win.setSize(800, 600, true);
+      win.setAlwaysOnTop(false);
+      win.setPosition(width/2-400, height/2-300);
+    }
+    eventRet.returnValue = '1'
   });
 
   //support prompt()
