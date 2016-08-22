@@ -1,6 +1,6 @@
 const electron = require('electron');
 // Module to control application life.
-const {app} = electron;
+const {app, globalShortcut} = electron;
 // Module to create native browser window.
 const {BrowserWindow} = electron;
 
@@ -18,7 +18,7 @@ function createWindow() {
   win.loadURL(`file://${__dirname}/index.html`);
 
   // Open the DevTools.
-  //win.webContents.openDevTools();
+  win.webContents.openDevTools();
 
   // Emitted when the window is closed.
   win.on('closed', () => {
@@ -70,6 +70,35 @@ function createWindow() {
     if (arg === ''){ arg = null }
     promptResponse = arg;
   });
+
+  //Register shortcut
+  const medianexttrack = globalShortcut.register('medianexttrack', () => {
+    win.webContents.send("medianexttrack", true);
+  })
+
+  if (!medianexttrack) {
+    console.log('registration failed')
+  }
+
+  //----------------
+
+  const mediaplaypause = globalShortcut.register('mediaplaypause', () => {
+    win.webContents.send("mediaplaypause", true);
+  })
+
+  if (!mediaplaypause) {
+    console.log('registration failed')
+  }
+
+  //----------------
+
+  const mediaprevioustrack = globalShortcut.register('mediaprevioustrack', () => {
+    win.webContents.send("mediaprevioustrack", true);
+  })
+
+  if (!mediaprevioustrack) {
+    console.log('registration failed')
+  }
 }
 
 // This method will be called when Electron has finished

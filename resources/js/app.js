@@ -5,7 +5,7 @@ var fs = require('fs');
 $ = jQuery = require("jquery");
 const {dialog} = require('electron').remote;
 const {clipboard} = require('electron');
-const ipcRenderer = require('electron').ipcRenderer
+const ipcRenderer = require('electron').ipcRenderer;
 
 var db = new Database();
 db.init();
@@ -18,6 +18,31 @@ tableList.draw($("#screen"));
 
 var ytdownloader = new YTdownloader();
 ytdownloader.draw($("#screen"));
+
+//Shortcuts listener
+ipcRenderer.on("medianexttrack", function(){
+	player.nextSong();
+});
+
+ipcRenderer.on("mediaplaypause", function(){
+	player.buttonPlay.button.click();
+});
+
+ipcRenderer.on("mediaprevioustrack", function(){
+	player.previousSong();
+});
+
+$(document).keydown(function(e) {
+	 switch(e.which) {
+		 case 122://F11
+		 	ipcRenderer.sendSync('toogleMode', {});
+			break;
+		 default:
+		 	break;
+	 }
+	  e.preventDefault();
+});
+//################
 
 $("#add_Song").click(function(){
 	dialog.showOpenDialog({title: "Escoge una musica",  filters: [{name: 'Canciones', extensions: ['mp3']},]}, function(e){
@@ -121,7 +146,7 @@ $("#playlist_default").click(function(){
 });
 
 //Load playlist rdy
-//$("#playlist_default").click();
+$("#playlist_default").click();
 
 $("#update").click(function(){
 	updater();
