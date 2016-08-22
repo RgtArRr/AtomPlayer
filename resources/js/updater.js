@@ -27,8 +27,10 @@ function updater (){
     if(flag){
       alert("Actualizacion terminada. Reiniciando...");
       //Restart
-      app.relaunch({args: process.argv.slice(1) + ['--relaunch']});
-      app.exit(0);
+      setTimeout(function(){
+        app.relaunch({args: process.argv.slice(1) + ['--relaunch']});
+        app.exit(0);
+      }, 3000);
     }else{
       alert("No hay actualizacion disponible.\n\nVersion " + currentversion + " es la ultima version.");
     }
