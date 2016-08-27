@@ -43,6 +43,28 @@ function createWindow() {
     eventRet.returnValue = '1'
   });
 
+  //Open Settings Window
+  var settingsWindow;
+  ipcMain.on('openSettings', function(eventRet, arg) {
+    var settingsWindow = new BrowserWindow({
+      parent: win,
+      width: 300,
+      height: 400,
+      show: false,
+      resizable: false,
+      movable: false,
+      alwaysOnTop: false,
+      frame: false
+    });
+    settingsWindow.loadURL(`file://${__dirname}/settings.html`);
+    settingsWindow.show();
+    settingsWindow.webContents.openDevTools();
+    settingsWindow.on('closed', function() {
+      console.log("test");
+      settingsWindow = null;
+    });
+  });
+
   //support prompt()
   var promptResponse;
   ipcMain.on('prompt', function(eventRet, arg) {
