@@ -30,7 +30,7 @@ function createWindow() {
 
   //Toogle Basic and full mode
   ipcMain.on('toogleMode', function(eventRet, arg) {
-    const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
+    const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
     if(win.getSize()[0] == 800 && win.getSize()[1] == 600){
       win.setSize(386, 75, true);
       win.setAlwaysOnTop(true);
@@ -58,11 +58,11 @@ function createWindow() {
     });
     settingsWindow.loadURL(`file://${__dirname}/settings.html`);
     settingsWindow.show();
-    settingsWindow.webContents.openDevTools();
+    //settingsWindow.webContents.openDevTools();
     settingsWindow.on('closed', function() {
-      console.log("test");
       settingsWindow = null;
     });
+    eventRet.returnValue = '1';
   });
 
   //support prompt()
@@ -94,33 +94,20 @@ function createWindow() {
   });
 
   //Register shortcut
-  const medianexttrack = globalShortcut.register('medianexttrack', () => {
-    win.webContents.send("medianexttrack", true);
-  })
-
-  if (!medianexttrack) {
-    console.log('registration failed')
-  }
-
-  //----------------
-
-  const mediaplaypause = globalShortcut.register('mediaplaypause', () => {
-    win.webContents.send("mediaplaypause", true);
-  })
-
-  if (!mediaplaypause) {
-    console.log('registration failed')
-  }
-
-  //----------------
-
-  const mediaprevioustrack = globalShortcut.register('mediaprevioustrack', () => {
-    win.webContents.send("mediaprevioustrack", true);
-  })
-
-  if (!mediaprevioustrack) {
-    console.log('registration failed')
-  }
+  ipcMain.on('registerShortcut', function(event, arg) {
+    console.log(arg.key, arg.channel);
+    try {
+      var shortcut = globalShortcut.register(arg.key, () => {
+        win.webContents.send(arg.channel, true);
+      });
+      if (!shortcut) {
+        console.log('shortcut failed' + arg[0]);
+      }
+    }catch(err) {
+      console.log(err);
+    }
+    event.returnValue = '1';
+  });
 }
 
 // This method will be called when Electron has finished

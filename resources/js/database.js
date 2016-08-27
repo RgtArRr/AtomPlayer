@@ -19,13 +19,18 @@ function Database() {
   var fileDB = app.getAppPath()+"/resources/db/DB.sqlite";
   this.db;
 
-  this.init = function(){
+  this.init = function(readyCallback){
     try {
       var filebuffer = fs.readFileSync(fileDB);
       self.db = new SQL.Database(filebuffer);
       console.log("Loaded DB");
     } catch (e) {
-      console.log("Failed DB: " + e);
+      self.db = new sql.Database();
+      self.writeDB("CREATE TABLE config ( medianexttrack TEXT, mediaprevioustrack TEXT, mediaplaypause TEXT, shuffle TEXT, volume INTEGER ); CREATE TABLE playlist ( id_playlist INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, nombre TEXT ); CREATE TABLE cancion ( id_cancion INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, nombre TEXT, ruta TEXT, duracion INTEGER, id_playlist INTEGER, FOREIGN KEY(id_playlist) REFERENCES playlist(id_playlist) ); INSERT INTO config VALUES ('0', '0', '0', '0', 10)");
+      console.log("No se puede obtener la bd, creando una nueva");
+    }
+    if(readyCallback){
+      readyCallback();
     }
   };
 
@@ -65,12 +70,20 @@ function Database() {
     this.writeDB("DELETE FROM cancion where id_cancion = '" + id_song + "'");
   };
 
+  this.setConfig = function(key, value){
+    this.writeDB("UPDATE config set "+key+" = '"+value+"'");
+  };
+
+  this.getConfig = function(){
+    return this.readDB("SELECT * FROM config where 1 = 1");
+  }
+
   this.writeDB = function (query, values) {
     var res = null;
     if(values){
       this.db.run(query, values);
     }else{
-        var res = this.db.exec(query);
+      var res = this.db.exec(query);
     }
     var data = this.db.export();
     var buffer = new Buffer(data);

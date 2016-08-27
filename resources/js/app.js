@@ -19,7 +19,18 @@ tableList.draw($("#screen"));
 var ytdownloader = new YTdownloader();
 ytdownloader.draw($("#screen"));
 
-//Shortcuts listener
+//Create Shortcuts listener and config
+var config = db.getConfig()[0].values[0];
+ipcRenderer.sendSync('registerShortcut', {"key": ((config[0]!=0)?keyboardMap[parseInt(config[0])]:"medianexttrack"), "channel": "medianexttrack"});
+ipcRenderer.sendSync('registerShortcut', {"key": ((config[1]!=0)?keyboardMap[parseInt(config[1])]:"mediaprevioustrack"), "channel": "mediaprevioustrack"});
+ipcRenderer.sendSync('registerShortcut', {"key": ((config[2]!=0)?keyboardMap[parseInt(config[2])]:"mediaplaypause"), "channel": "mediaplaypause"});
+if(config[3]==1){
+	player.buttonShuffle.button.click();
+}
+player.audioPlayer.get(0).volume = config[4] / 10;
+player.buttonVolume.range.val(config[4]/10);
+//-------------------------------------------------
+
 ipcRenderer.on("medianexttrack", function(){
 	player.nextSong();
 });
@@ -33,14 +44,14 @@ ipcRenderer.on("mediaprevioustrack", function(){
 });
 
 $(document).keydown(function(e) {
-	 switch(e.which) {
-		 case 122://F11
-		 	ipcRenderer.sendSync('toogleMode', {});
-			break;
-		 default:
-		 	break;
-	 }
-	  e.preventDefault();
+	switch(e.which) {
+		case 122://F11
+		ipcRenderer.sendSync('toogleMode', {});
+		break;
+		default:
+		break;
+	}
+	e.preventDefault();
 });
 //################
 
@@ -57,7 +68,7 @@ $("#add_Song").click(function(){
 				}
 			});
 		}
-});
+	});
 });
 
 $("#home").click(function(){
@@ -339,10 +350,12 @@ function Player(){
 				self.audioPlayer.get(0).volume = self.lastVolume;
 				self.buttonVolume.range.val(self.lastVolume);
 				self.lastVolume = 0;
+				db.setConfig("volume", self.lastVolume * 10);
 			}else{
 				self.lastVolume = self.audioPlayer.get(0).volume;
 				self.audioPlayer.get(0).volume = 0;
 				self.buttonVolume.range.val(0);
+				db.setConfig("volume", 0);
 			}
 		});
 
@@ -360,6 +373,7 @@ function Player(){
 				if(self.lastVolume != e.target.value){
 					self.audioPlayer.get(0).volume = e.target.value;
 					self.lastVolume = e.target.value;
+					db.setConfig("volume", e.target.value * 10);
 				}
 			}
 		});
@@ -372,6 +386,11 @@ function Player(){
 
 		this.buttonShuffle.button.click(function(){
 			self.buttonShuffle.button.toggleClass("btn-active");
+			if(self.buttonShuffle.button.hasClass("btn-active")){
+				db.setConfig("shuffle", "1");
+			}else{
+				db.setConfig("shuffle", "0");
+			}
 		});
 
 		this.buttonMaximize.button.click(function(){
