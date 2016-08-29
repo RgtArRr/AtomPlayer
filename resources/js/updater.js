@@ -8,7 +8,7 @@ function updater (){
         $.each(k, function(jj,kk){
           if(kk.type === "add"){
             $.ajax({
-              url: "https://raw.githubusercontent.com/RgtArRr/kPlayer/" + kk.url,
+              url: "https://raw.githubusercontent.com/RgtArRr/AtomPlayer/" + kk.url,
               type:  "GET",
               dataType: kk.dataType,
               processData: false,
