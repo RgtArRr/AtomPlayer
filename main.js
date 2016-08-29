@@ -28,6 +28,13 @@ function createWindow() {
     win = null;
   });
 
+  win.on("minimize", function (){
+    const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
+    if(win.getSize()[0] == 386 && win.getSize()[1] == 75){
+      win.show();
+    }
+  });
+
   //Toogle Basic and full mode
   ipcMain.on('toogleMode', function(eventRet, arg) {
     const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
@@ -48,7 +55,7 @@ function createWindow() {
   ipcMain.on('openSettings', function(eventRet, arg) {
     var settingsWindow = new BrowserWindow({
       parent: win,
-      width: 300,
+      width: 500,
       height: 400,
       show: false,
       resizable: false,
@@ -58,7 +65,7 @@ function createWindow() {
     });
     settingsWindow.loadURL(`file://${__dirname}/settings.html`);
     settingsWindow.show();
-    //settingsWindow.webContents.openDevTools();
+    settingsWindow.webContents.openDevTools();
     settingsWindow.on('closed', function() {
       settingsWindow = null;
     });
@@ -96,17 +103,20 @@ function createWindow() {
   //Register shortcut
   ipcMain.on('registerShortcut', function(event, arg) {
     console.log(arg.key, arg.channel);
+    var response = "1";
     try {
       var shortcut = globalShortcut.register(arg.key, () => {
         win.webContents.send(arg.channel, true);
       });
       if (!shortcut) {
+        response = "0";
         console.log('shortcut failed' + arg[0]);
       }
     }catch(err) {
+      response = "0";
       console.log(err);
     }
-    event.returnValue = '1';
+    event.returnValue = response;
   });
 }
 

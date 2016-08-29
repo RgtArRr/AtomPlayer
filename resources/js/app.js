@@ -21,9 +21,9 @@ ytdownloader.draw($("#screen"));
 
 //Create Shortcuts listener and config
 var config = db.getConfig()[0].values[0];
-ipcRenderer.sendSync('registerShortcut', {"key": ((config[0]!=0)?keyboardMap[parseInt(config[0])]:"medianexttrack"), "channel": "medianexttrack"});
-ipcRenderer.sendSync('registerShortcut', {"key": ((config[1]!=0)?keyboardMap[parseInt(config[1])]:"mediaprevioustrack"), "channel": "mediaprevioustrack"});
-ipcRenderer.sendSync('registerShortcut', {"key": ((config[2]!=0)?keyboardMap[parseInt(config[2])]:"mediaplaypause"), "channel": "mediaplaypause"});
+ipcRenderer.sendSync('registerShortcut', {"key": ((config[0]!=0)?config[0]:"medianexttrack"), "channel": "medianexttrack"});
+ipcRenderer.sendSync('registerShortcut', {"key": ((config[1]!=0)?config[1]:"mediaprevioustrack"), "channel": "mediaprevioustrack"});
+ipcRenderer.sendSync('registerShortcut', {"key": ((config[2]!=0)?config[2]:"mediaplaypause"), "channel": "mediaplaypause"});
 if(config[3]==1){
 	player.buttonShuffle.button.click();
 }

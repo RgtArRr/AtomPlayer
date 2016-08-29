@@ -1,18 +1,5 @@
 var sql = require('sql.js');
 const {app} = require('electron').remote;
-/*
-var fileDB = "resources/DB.sqlite";
-var db;
-try {
-console.log("Loaded DB");
-var filebuffer = fs.readFileSync(fileDB);
-db = new database(filebuffer);
-}catch (e) {
-console.log("Failed DB");
-/*
-db = new database(new sql.Database());
-db.writeDB("CREATE TABLE libreta (id_libreta integer NOT NULL PRIMARY KEY AUTOINCREMENT, titulo	text, contenido	text NOT NULL, created_at	text, update_at	text, delete_at	text);");
-}*/
 
 function Database() {
   var self = this;
