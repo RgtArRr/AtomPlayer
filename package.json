@@ -1,6 +1,6 @@
 {
-  "name": "kPlayer",
-  "description" : "Reproductor de musica",
+  "name": "AtomPlayer",
+  "description" : "Reproductor de musica, descarga mp3 de youtube",
   "version": "0.2.1",
   "main": "main.js",
   "license": "Apache-2.0",

@@ -70,21 +70,21 @@
     var config = db.getConfig()[0].values[0];
     //medianexttrack
     if(config[0] != 0){
-      $("#medianexttrack").html(keyboardMap[parseInt(config[0])]);
+      $("#medianexttrack").html(getKey[parseInt(config[0])]);
     }else{
       $("#medianexttrack").html("ELEGIR");
     }
 
     //mediaprevioustrack
     if(config[1] != 0){
-      $("#mediaprevioustrack").html(keyboardMap[parseInt(config[1])]);
+      $("#mediaprevioustrack").html(getKey[parseInt(config[1])]);
     }else{
       $("#mediaprevioustrack").html("ELEGIR");
     }
 
     //mediaplaypause
     if(config[1] != 0){
-      $("#mediaplaypause").html(keyboardMap[parseInt(config[2])]);
+      $("#mediaplaypause").html(getKey[parseInt(config[2])]);
     }else{
       $("#mediaplaypause").html("ELEGIR");
     }
@@ -153,8 +153,12 @@
     this.lastCallback;
 
     $("body").keydown(function(e) {
+
+      if(getKey(e.keyCode)){
+        console.log(e.altKey, e.ctrlKey, e.shiftKey, e.keyCode, e.key);
+        self.newKeyDown(e.which);
+      }
       e.preventDefault();
-      self.newKeyDown(e.which);
     });
 
     this.getNextKey = function(callback){
