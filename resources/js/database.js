@@ -65,6 +65,18 @@ function Database() {
     return this.readDB("SELECT * FROM config where 1 = 1");
   }
 
+  this.getLyrics = function(id_song){
+    return this.readDB("SELECT * FROM lyrics where id_cancion='"+id_song+"'");
+  }
+
+  this.setLyrics = function(id_song, url){
+    this.writeDB("INSERT OR REPLACE INTO lyrics(id_cancion, url_lyrics) VALUES('"+id_song+"', '"+url+"')");
+  }
+
+  this.createTableLyrics = function(){
+    this.writeDB("CREATE table IF NOT EXISTS lyrics (id_cancion	INTEGER UNIQUE,url_lyrics TEXT)");
+  }
+
   this.writeDB = function (query, values) {
     var res = null;
     if(values){

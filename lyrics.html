@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Letras</title>
+</head>
+<script type="text/javascript">
+$ = jQuery = require("jquery");
+var last_idsong;
+const ipcRenderer = require('electron').ipcRenderer;
+ipcRenderer.on("lyrics", function(event, arg){
+  last_idsong = arg.id_song;
+  $("#lyrics").html(arg.data);
+  $( window ).resize();
+});
+ipcRenderer.on("scrollLyrics", function(event, arg){
+  $("#lyrics").scrollTop($("#lyrics").height() * arg/100);
+});
+$( window ).resize(function() {
+  $("#lyrics").height($( window ).height() - 30);
+});
+</script>
+<style media="screen">
+.selected{
+  border: 1px solid white;
+  border-style: dashed;
+}
+
+.text-lyrics{
+  overflow-x: hidden;
+  overflow-y: auto;
+  color: white;
+  text-align: center
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+.tool{
+  padding: 0px 0px 0px 5px;
+}
+</style>
+<body>
+  <div style="position: fixed;top: 18px;right: 12px;" id="tools-panel">
+    <!--color-->
+    <img width="16" height="16" title="Cambiar tono" onclick="$('#lyrics').css('color', getColor());" alt="" class="tool" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarY6xSsNQFEDPi6LiUCsEcXB4kygotupgxqQtRRCs1SHJ1qShSmkSXl7VfoSjWwcXd7/AyVFwUPwC/0Bx6uAQIYODCJ7p3MPlcsGo2HWnYZRhEGvVbjrS9Xw5+8QMUwDQCbPUbrUOAOIkjvjB5ysC4HnTrjsN/sZ8mCoNTIDtbpSFICpA/0KnGsQYMIN+qkHcAaY6addAPAClXu4vQCnI/Q0oKdfzQXwAZs/1fDDmADPIfQUwdXSpAWpJOlJnvVMtq5ZlSbubBJE8HmU6GmRyPw4TlSaqo6MukP8HwGK+2G46cq1qWXvr/DOu58vc3o8QgFh6LFpBOFTn3yqMnd/n4sZ4GQ5vYXpStN0ruNmAheuirVahvAX34y/Axk/96FpPYgAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAD/klEQVR42oyWSXPbRhCFvwEGXAYkRJEWI9myFclaIqtSlUMO4TEn51/mX6Ryy5H3KKqKLFouK7HWiDsWLiByQEOAfTKqpooYzLzX3fPmNRU/JFADPKABNIEW0AazSXfrJW1vg4ZZx7VrONizZM50NmMYjXkc3vDpPuCmA/8Bj0AfGAETYILGBxLSxwJsMC7d/Qp764YNBYoVEOfrKmAqKLOG1dzG3R1g7nrMLgOmHZiSjgngo5kAS2CVbt5scnrY4NiKsQkAF5jLmgRAyeIFMEcRqSa0f6TV6vFwds3kJAMHHws/J9x1uTjyOLF8bCYy7wOhZCBBpD+WQCQffSwC+xDvzS7mAsZPGVgEKdDzKmc7HvtqgmIkZcxKGUoWcZFgLgRZOVLQHbz955izdD7AcmJwFd39LY7wZe0QGMgYyd6wSBDLRAY8LETjs0/7yEBXEaFd4OA1u6UV9jKQzLMDTQAHMMAz+QYS/VSA+4VIAiDCYmF/x87eOX+i24budpP2Uo5tOYflInsRvLLI9wXCGgroA3AvvyfADE2CA9RZ3xhhuvpgi7anUMsnXcA8gXmQkrEQEg/YAbaQaK+Bf4VggiamLLE4gINSh2y19QuPRkWqkpEsgBkQLiF8hGUg6nwJHANcAX8DV2giDFBN7wclIdCAwWvoTYObKTspHMGyoJNJCP1TqdhbBfyB5h0tSaxaiNyWYQEJxtUtG0fxlc8plHj7tatJsB3dFDarwG5LNCUR0BqwCbS4h5+BX2H6bVr9XDu5LlaFe6kbMQvHoqwFuCSjKuCeEGjugN/S0H6H2i9QewVTK7+LoZzd4qnE8ULXA/zqGmWnAF4R8JQkETn+BfRSgg/yCtS+AVPNs4gyJQIRga/rY4buGs3yFwQVQLMQjX8U5fRT1AHwj6QHWC2o1aCicoIZ4DAeaveG+/o2u2WFKhVIFJFU+A64kSzCFDEU678V+Yh7aANuKcNIEpube10P6JgBd+Um7VS/ScFn+gL8KGSz3CkmMm1E9OKBqgqlMtjW4MEi6Fg1oNLjsrwi1ixFE5OCzwxlBLl3xPI6Ft7MGMeZva9ie967NIBVBSoBHas3P8/td/zF8OX44pxgViAZF4x1Cox650yDDiFoh1W6+jo8oRxd8Cp8jZqqfNdUSrbIO07W0CIhmcrBaWB+9Z7q9Qn11Bp0ulki/zA+IAxOOZwdY/l23s5mn/fVrKHNnhoalFcx0ft3mE9vWH+6yhlB8PQvgNv+94xHXfbne6wHG6hIfX5HxbTiLIsk4XHwQL93yVrQ4ZncWPEflfCx0Payg31Mbdj0u2wt2nhhAxO66KAEPpSWc3Tg44yHWLcPeP5PbAAb0jeacv3r8P8AZLXIX+ucLtwAAAAASUVORK5CYII=" />
+    <!--drag-->
+    <img width="16" height="16" title="Mover" alt="" class="tool" style="-webkit-app-region: drag; cursor: pointer;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarY6xSsNQFEDPi6LiUCsEcXB4kygotupgxqQtRRCs1SHJ1qShSmkSXl7VfoSjWwcXd7/AyVFwUPwC/0Bx6uAQIYODCJ7p3MPlcsGo2HWnYZRhEGvVbjrS9Xw5+8QMUwDQCbPUbrUOAOIkjvjB5ysC4HnTrjsN/sZ8mCoNTIDtbpSFICpA/0KnGsQYMIN+qkHcAaY6addAPAClXu4vQCnI/Q0oKdfzQXwAZs/1fDDmADPIfQUwdXSpAWpJOlJnvVMtq5ZlSbubBJE8HmU6GmRyPw4TlSaqo6MukP8HwGK+2G46cq1qWXvr/DOu58vc3o8QgFh6LFpBOFTn3yqMnd/n4sZ4GQ5vYXpStN0ruNmAheuirVahvAX34y/Axk/96FpPYgAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAAxElEQVR42uyWQQrCMBREJ72KXk/BRePKdKNdFAXF8+kRpEsFYdwkCGlafvBnofigdNH8DGWmkxqSyOAI4ALgLJ4gKb32fFNL56SbbzlkoyXQMM1d8iYmw4N4oZEMVSjM7wlYhT3d2HfgSPYTiYiZWtfGMa39gwf16ILAkuU4VQDmBT2+gqSJeuZTnv5u46poBeZJTO59vSS7yCkIrP9d9H0CFsBtxJNG60x2iRTtNM/kEL/AQTpnMn9bFgBmAFaJ2CZ5DQCbvpZmBE5BPgAAAABJRU5ErkJggg==" />
+    <!--error-->
+    <img width="16" height="16" title="Corregir lyrics" onclick="corregir();" alt="" class="tool" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarY6xSsNQFEDPi6LiUCsEcXB4kygotupgxqQtRRCs1SHJ1qShSmkSXl7VfoSjWwcXd7/AyVFwUPwC/0Bx6uAQIYODCJ7p3MPlcsGo2HWnYZRhEGvVbjrS9Xw5+8QMUwDQCbPUbrUOAOIkjvjB5ysC4HnTrjsN/sZ8mCoNTIDtbpSFICpA/0KnGsQYMIN+qkHcAaY6addAPAClXu4vQCnI/Q0oKdfzQXwAZs/1fDDmADPIfQUwdXSpAWpJOlJnvVMtq5ZlSbubBJE8HmU6GmRyPw4TlSaqo6MukP8HwGK+2G46cq1qWXvr/DOu58vc3o8QgFh6LFpBOFTn3yqMnd/n4sZ4GQ5vYXpStN0ruNmAheuirVahvAX34y/Axk/96FpPYgAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAAgElEQVR42uxVQQqAMAxLxav+Qtzn+wHxT0PxHi/1JNt62EBwgVyWhjAaqJCEA6khKRkHNEYP6AE9oAf8ImB0zknrHywAFMBhVHtzXBKyxJVk5BvRtKzfE6BMQ0t+cZzMA8Cc0C4A0+drume0rcaSQ2bJocaSnyYpydOongaRxD0A82VEQVHOq6QAAAAASUVORK5CYII=" />
+    <!--close-->
+    <img width="16" height="16" title="Ocultar lyrics" onclick="ipcRenderer.sendSync('closeLyrics', {});" alt="" class="tool" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarY6xSsNQFEDPi6LiUCsEcXB4kygotupgxqQtRRCs1SHJ1qShSmkSXl7VfoSjWwcXd7/AyVFwUPwC/0Bx6uAQIYODCJ7p3MPlcsGo2HWnYZRhEGvVbjrS9Xw5+8QMUwDQCbPUbrUOAOIkjvjB5ysC4HnTrjsN/sZ8mCoNTIDtbpSFICpA/0KnGsQYMIN+qkHcAaY6addAPAClXu4vQCnI/Q0oKdfzQXwAZs/1fDDmADPIfQUwdXSpAWpJOlJnvVMtq5ZlSbubBJE8HmU6GmRyPw4TlSaqo6MukP8HwGK+2G46cq1qWXvr/DOu58vc3o8QgFh6LFpBOFTn3yqMnd/n4sZ4GQ5vYXpStN0ruNmAheuirVahvAX34y/Axk/96FpPYgAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAA4UlEQVR42qSVQQ6CMBBFn8QTeFcNg3uNcFlu8N0MkZDaToefdFPgvXZg6EUSng+wAm/OZQRuwAMASUia9Yv5XGaMO84siSP8jGQscObBy3LMC7DOspRKu272SeVYcuVyJvsbM5Iq/CjolVgLXhJEJSH4P0FLEobXBDVJGN4SRCVTjRFpoCkLl8QQaCIlr7H/F/0bFiiRZUtkHS/ZegW1T7Gr40l2aFiSav8eSRYelpyBt561TXAG3pQMfkAf8/RTLZo3MBXmb9sKluTKaztZJHF1093bfu1ceWkneFXuAN8BAJn4LA6PX2sQAAAAAElFTkSuQmCC" />
+  </div>
+
+  <pre id="lyrics" class="text-lyrics">
+
+  </pre>
+  <div id="search-lyrics" style="background: antiquewhite;">
+    <form id="busqueda">
+      <input id="search" type="text" name="name" value="" style="width: 60%;padding: 3px 0px 3px 10px;">
+    </form>
+    <ul id="resultado">
+
+    </ul>
+  </div>
+
+  <script>
+  $(".tool").hide();
+  $("#search-lyrics").hide();
+  $("body").hover(
+    function () {
+      $("#lyrics").addClass("selected");
+      $(".tool").show();
+    },
+    function () {
+      $("#lyrics").removeClass("selected");
+      $(".tool").hide();
+    }
+  );
+
+  var cont = 0;
+  var paleta = [{"color": "#DF0101"}, {"color": "#FFFF00"}, {"color": "#00FF00"}, {"color": "#0000FF"}, {"color": "#FE2EC8"}, {"color": "#151515"}];
+  function getColor(){
+    cont++;
+    if(paleta.length <= cont){
+      cont = 0;
+    }
+    return paleta[cont].color;
+  }
+
+  function corregir(){
+    $("#lyrics").hide();
+    $("#search-lyrics").show();
+    $("#busqueda").submit(function(e){
+      e.preventDefault();
+      $("#resultado").html("");
+      $.get("http://api.lyricsnmusic.com/songs?api_key=af12e83acd3975fdbd0f3d9b93cf4a&q="+$("#search").val(), function(data){
+        $.each(data, function(j,k){
+          var song = $("<li></li>");
+          song.html(k.artist.name+ " - "+ k.title);
+          song.click(function(){
+            showLyrics(k.url);
+          });
+          $("#resultado").append(song);
+        });
+      }, "json");
+    });
+  }
+
+  function showLyrics(url){
+    $("#lyrics").show();
+    $("#search-lyrics").hide();
+    $("#lyrics").html();
+    $.get(url, function(data){
+      var page = $(data);
+      var lyrics = $(page.find("pre")[0]).html();
+      if(lyrics){
+        $("#lyrics").html(lyrics);
+        $( window ).resize();
+        ipcRenderer.sendSync("registerLyrics", {"id_song": last_idsong, "url": url});
+      }
+    });
+  }
+  </script>
+</body>
+</html>

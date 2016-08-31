@@ -28,8 +28,9 @@ function createWindow() {
     win = null;
   });
 
+  const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
+
   win.on("minimize", function (){
-    const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
     if(win.getSize()[0] == 386 && win.getSize()[1] == 75){
       win.show();
     }
@@ -37,7 +38,6 @@ function createWindow() {
 
   //Toogle Basic and full mode
   ipcMain.on('toogleMode', function(eventRet, arg) {
-    const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
     if(win.getSize()[0] == 800 && win.getSize()[1] == 600){
       win.setSize(386, 75, true);
       win.setAlwaysOnTop(true);
@@ -50,12 +50,54 @@ function createWindow() {
     eventRet.returnValue = '1'
   });
 
+  //Lyrics windows
+  var lyricsWindows =new BrowserWindow({
+    width: 500,
+    height: 400,
+    show: false,
+    movable: true,
+    alwaysOnTop: true,
+    frame: false,
+    fullscreenable: false,
+    transparent: true
+  });
+  lyricsWindows.loadURL(`file://${__dirname}/lyrics.html`);
+  lyricsWindows.hide();
+  //lyricsWindows.webContents.openDevTools();
+  lyricsWindows.setPosition(width-500, 45);
+
+  ipcMain.on('openLyrics', function(eventRet, arg) {
+    lyricsWindows.show();
+    lyricsWindows.webContents.send("lyrics", arg);
+    eventRet.returnValue = '1';
+  });
+
+  ipcMain.on('closeLyrics', function(eventRet, arg) {
+    lyricsWindows.hide();
+    eventRet.returnValue = '1';
+  });
+
+  ipcMain.on('scrollLyrics', function(eventRet, arg) {
+    lyricsWindows.webContents.send("scrollLyrics", arg.value);
+    eventRet.returnValue = '1';
+  });
+
+  ipcMain.on('registerLyrics', function(eventRet, arg) {
+    win.webContents.send("registerLyrics", arg);
+    eventRet.returnValue = '1';
+  });
+
+  ipcMain.on('activeLyrics', function(eventRet, arg) {
+    win.webContents.send("activeLyrics", arg);
+    eventRet.returnValue = '1';
+  });
+
   //Open Settings Window
   var settingsWindow;
   ipcMain.on('openSettings', function(eventRet, arg) {
     var settingsWindow = new BrowserWindow({
       parent: win,
-      width: 500,
+      width: 300,
       height: 400,
       show: false,
       resizable: false,
@@ -65,7 +107,7 @@ function createWindow() {
     });
     settingsWindow.loadURL(`file://${__dirname}/settings.html`);
     settingsWindow.show();
-    settingsWindow.webContents.openDevTools();
+    //settingsWindow.webContents.openDevTools();
     settingsWindow.on('closed', function() {
       settingsWindow = null;
     });

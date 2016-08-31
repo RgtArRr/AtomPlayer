@@ -9,6 +9,7 @@ const ipcRenderer = require('electron').ipcRenderer;
 
 var db = new Database();
 db.init();
+db.createTableLyrics();
 
 var player = new Player();
 player.draw($(".window-content"));
@@ -41,6 +42,11 @@ ipcRenderer.on("mediaplaypause", function(){
 
 ipcRenderer.on("mediaprevioustrack", function(){
 	player.previousSong();
+});
+
+var hasLyrics = false;
+ipcRenderer.on("activeLyrics", function(){
+	hasLyrics = true;
 });
 
 $(document).keydown(function(e) {
@@ -87,6 +93,9 @@ $("#settings").click(function(){
 	ipcRenderer.sendSync('openSettings', {});
 });
 
+ipcRenderer.on("registerLyrics", function(event, data){
+	db.setLyrics(data.id_song, data.url);
+});
 
 //Temporal Playlist event
 //******
@@ -308,6 +317,8 @@ function Player(){
 				self.audioPlayer.get(0).currentTime = self.seekPlayer.value * this.duration;
 				self.seekPlayer = {status : 0};
 			}
+			//Temporalmente desactivado
+			//ipcRenderer.send("scrollLyrics", {"value": Math.round(this.currentTime / this.duration*100)});
 			self.progressBar.progress.attr("value", this.currentTime / this.duration);
 			self.progressBar.currentTime.html(sectostr(Math.round(this.currentTime)));
 		});
@@ -423,6 +434,29 @@ function Player(){
 				$(k).addClass("currentSong");
 			}
 		});
+		if(hasLyrics){
+			var url_lyrics;
+			$.get("http://api.lyricsnmusic.com/songs?api_key=af12e83acd3975fdbd0f3d9b93cf4a&q="+title, function(data){
+				if(db.getLyrics(id_song)[0]){
+					url_lyrics = db.getLyrics(id_song)[0].values[0][1];
+				}else{
+					if(data[0]){
+						url_lyrics = data[0].url;
+					}
+				}
+				if(url_lyrics){
+					$.get(url_lyrics, function(data){
+						var page = $(data);
+						var lyrics = $(page.find("pre")[0]).html();
+						if(lyrics){
+							ipcRenderer.sendSync('openLyrics', {"data": lyrics, "id_song": id_song});
+						}
+					});
+				}else{
+					ipcRenderer.sendSync('openLyrics', {"data": "NO SE HA ENCONTRADO.", "id_song": id_song});
+				}
+			}, "json");
+		}
 	};
 
 	this.nextSong = function(){

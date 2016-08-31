@@ -32,10 +32,13 @@
   #restart{
     color: red;
   }
+
+  .active-button{
+    color: red;
+  }
   </style>
 </head>
 <body>
-
   <div class="window">
     <header class="toolbar toolbar-header">
       <h1 class="title">Opciones</h1>
@@ -48,8 +51,11 @@
       <div class="shortcutDiv"><span class="keyboard" id="mediaprevioustrack"> </span>: Anterior cancion</div>
       <div class="shortcutDiv"><span class="keyboard" id="mediaplaypause"> </span>: Reproducir o Pausar la cancion</div>
 
+      <div class="shortcutDiv"><span class="keyboard" id="lyrics">Lyrics</span>: Activar lyrics (Beta).</div>
+
       <div id="message">Presiona la tecla a asignar.</div>
-      <div id="restart">Es necesario reiniciar la aplicacion</div>
+      <div id="restart">Es necesario reiniciar la aplicacion.</div>
+      <div id="temp">Solo temporalmente.</div>
 
       <button class="btn btn-default" id="close">Cerrar</button>
     </div>
@@ -59,6 +65,7 @@
   </div>
   <script type="text/javascript">
   var fs = require('fs');
+  const ipcRenderer = require('electron').ipcRenderer;
   </script>
   <script type="text/javascript" src="resources/js/keycode.js"></script>
   <script type="text/javascript" src="resources/js/database.js"></script>
@@ -92,6 +99,7 @@
 
   $("#message").hide();
   $("#restart").hide();
+  $("#temp").hide();
 
   var keydown = new keyUtil();
 
@@ -138,6 +146,12 @@
       $("#message").hide();
       $("#restart").show();
     });
+  });
+
+  $("#lyrics").click(function(){
+    $("#lyrics").addClass("active-button");
+    $("#temp").show();
+    ipcRenderer.sendSync("activeLyrics", {});
   });
 
   $("footer h1.title").append(require('./package.json').version);
