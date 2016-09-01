@@ -450,6 +450,8 @@ function Player(){
 						var lyrics = $(page.find("pre")[0]).html();
 						if(lyrics){
 							ipcRenderer.sendSync('openLyrics', {"data": lyrics, "id_song": id_song});
+						}else{
+							ipcRenderer.sendSync('openLyrics', {"data": "NO SE HA ENCONTRADO.", "id_song": id_song});
 						}
 					});
 				}else{
@@ -509,23 +511,25 @@ function Player(){
 //-----------------------------------------------------
 var lastUrl = ""
 setInterval(function(){
-	if(clipboard.readText() != lastUrl){
-		var url = urlObject({"url" : clipboard.readText()});
-		var idvideo = null;
-		switch(url.hostname) {
-			case "www.youtube.com":
-			case "youtube.com":
-			idvideo = url.parameters["v"];
-			break;
-			case "www.youtu.be":
-			case "youtu.be":
-			idvideo = url.pathname.split("/")[1];
-			break;
-			default:
-		}
-		if(idvideo){
-			ytdownloader.input.input.val(clipboard.readText());
-			lastUrl = clipboard.readText();
+	if(!ytdownloader.isDownload){
+		if(clipboard.readText() != lastUrl){
+			var url = urlObject({"url" : clipboard.readText()});
+			var idvideo = null;
+			switch(url.hostname) {
+				case "www.youtube.com":
+				case "youtube.com":
+				idvideo = url.parameters["v"];
+				break;
+				case "www.youtu.be":
+				case "youtu.be":
+				idvideo = url.pathname.split("/")[1];
+				break;
+				default:
+			}
+			if(idvideo){
+				ytdownloader.input.input.val(clipboard.readText());
+				lastUrl = clipboard.readText();
+			}
 		}
 	}
 }, 1000);

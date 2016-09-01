@@ -46,6 +46,11 @@ $( window ).resize(function() {
   border-radius: 10px;
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 }
+
+img{
+  -webkit-user-drag:none;
+}
+
 .tool{
   padding: 0px 0px 0px 5px;
 }
@@ -53,7 +58,7 @@ $( window ).resize(function() {
 <body>
   <div style="position: fixed;top: 18px;right: 12px;" id="tools-panel">
     <!--color-->
-    <img width="16" height="16" title="Cambiar tono" onclick="$('#lyrics').css('color', getColor());" alt="" class="tool" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarY6xSsNQFEDPi6LiUCsEcXB4kygotupgxqQtRRCs1SHJ1qShSmkSXl7VfoSjWwcXd7/AyVFwUPwC/0Bx6uAQIYODCJ7p3MPlcsGo2HWnYZRhEGvVbjrS9Xw5+8QMUwDQCbPUbrUOAOIkjvjB5ysC4HnTrjsN/sZ8mCoNTIDtbpSFICpA/0KnGsQYMIN+qkHcAaY6addAPAClXu4vQCnI/Q0oKdfzQXwAZs/1fDDmADPIfQUwdXSpAWpJOlJnvVMtq5ZlSbubBJE8HmU6GmRyPw4TlSaqo6MukP8HwGK+2G46cq1qWXvr/DOu58vc3o8QgFh6LFpBOFTn3yqMnd/n4sZ4GQ5vYXpStN0ruNmAheuirVahvAX34y/Axk/96FpPYgAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAD/klEQVR42oyWSXPbRhCFvwEGXAYkRJEWI9myFclaIqtSlUMO4TEn51/mX6Ryy5H3KKqKLFouK7HWiDsWLiByQEOAfTKqpooYzLzX3fPmNRU/JFADPKABNIEW0AazSXfrJW1vg4ZZx7VrONizZM50NmMYjXkc3vDpPuCmA/8Bj0AfGAETYILGBxLSxwJsMC7d/Qp764YNBYoVEOfrKmAqKLOG1dzG3R1g7nrMLgOmHZiSjgngo5kAS2CVbt5scnrY4NiKsQkAF5jLmgRAyeIFMEcRqSa0f6TV6vFwds3kJAMHHws/J9x1uTjyOLF8bCYy7wOhZCBBpD+WQCQffSwC+xDvzS7mAsZPGVgEKdDzKmc7HvtqgmIkZcxKGUoWcZFgLgRZOVLQHbz955izdD7AcmJwFd39LY7wZe0QGMgYyd6wSBDLRAY8LETjs0/7yEBXEaFd4OA1u6UV9jKQzLMDTQAHMMAz+QYS/VSA+4VIAiDCYmF/x87eOX+i24budpP2Uo5tOYflInsRvLLI9wXCGgroA3AvvyfADE2CA9RZ3xhhuvpgi7anUMsnXcA8gXmQkrEQEg/YAbaQaK+Bf4VggiamLLE4gINSh2y19QuPRkWqkpEsgBkQLiF8hGUg6nwJHANcAX8DV2giDFBN7wclIdCAwWvoTYObKTspHMGyoJNJCP1TqdhbBfyB5h0tSaxaiNyWYQEJxtUtG0fxlc8plHj7tatJsB3dFDarwG5LNCUR0BqwCbS4h5+BX2H6bVr9XDu5LlaFe6kbMQvHoqwFuCSjKuCeEGjugN/S0H6H2i9QewVTK7+LoZzd4qnE8ULXA/zqGmWnAF4R8JQkETn+BfRSgg/yCtS+AVPNs4gyJQIRga/rY4buGs3yFwQVQLMQjX8U5fRT1AHwj6QHWC2o1aCicoIZ4DAeaveG+/o2u2WFKhVIFJFU+A64kSzCFDEU678V+Yh7aANuKcNIEpube10P6JgBd+Um7VS/ScFn+gL8KGSz3CkmMm1E9OKBqgqlMtjW4MEi6Fg1oNLjsrwi1ixFE5OCzwxlBLl3xPI6Ft7MGMeZva9ie967NIBVBSoBHas3P8/td/zF8OX44pxgViAZF4x1Cox650yDDiFoh1W6+jo8oRxd8Cp8jZqqfNdUSrbIO07W0CIhmcrBaWB+9Z7q9Qn11Bp0ulki/zA+IAxOOZwdY/l23s5mn/fVrKHNnhoalFcx0ft3mE9vWH+6yhlB8PQvgNv+94xHXfbne6wHG6hIfX5HxbTiLIsk4XHwQL93yVrQ4ZncWPEflfCx0Payg31Mbdj0u2wt2nhhAxO66KAEPpSWc3Tg44yHWLcPeP5PbAAb0jeacv3r8P8AZLXIX+ucLtwAAAAASUVORK5CYII=" />
+    <img width="16" height="16" title="Cambiar tono" onclick="var paleta = getColor(); $('#lyrics').css('color', paleta.color); $('#lyrics').css('background-color', ((paleta.background=='1')?'rgba(0, 0, 0, 0.7)':'rgba(255, 255, 255, 0.7)'));" alt="" class="tool" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarY6xSsNQFEDPi6LiUCsEcXB4kygotupgxqQtRRCs1SHJ1qShSmkSXl7VfoSjWwcXd7/AyVFwUPwC/0Bx6uAQIYODCJ7p3MPlcsGo2HWnYZRhEGvVbjrS9Xw5+8QMUwDQCbPUbrUOAOIkjvjB5ysC4HnTrjsN/sZ8mCoNTIDtbpSFICpA/0KnGsQYMIN+qkHcAaY6addAPAClXu4vQCnI/Q0oKdfzQXwAZs/1fDDmADPIfQUwdXSpAWpJOlJnvVMtq5ZlSbubBJE8HmU6GmRyPw4TlSaqo6MukP8HwGK+2G46cq1qWXvr/DOu58vc3o8QgFh6LFpBOFTn3yqMnd/n4sZ4GQ5vYXpStN0ruNmAheuirVahvAX34y/Axk/96FpPYgAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAD/klEQVR42oyWSXPbRhCFvwEGXAYkRJEWI9myFclaIqtSlUMO4TEn51/mX6Ryy5H3KKqKLFouK7HWiDsWLiByQEOAfTKqpooYzLzX3fPmNRU/JFADPKABNIEW0AazSXfrJW1vg4ZZx7VrONizZM50NmMYjXkc3vDpPuCmA/8Bj0AfGAETYILGBxLSxwJsMC7d/Qp764YNBYoVEOfrKmAqKLOG1dzG3R1g7nrMLgOmHZiSjgngo5kAS2CVbt5scnrY4NiKsQkAF5jLmgRAyeIFMEcRqSa0f6TV6vFwds3kJAMHHws/J9x1uTjyOLF8bCYy7wOhZCBBpD+WQCQffSwC+xDvzS7mAsZPGVgEKdDzKmc7HvtqgmIkZcxKGUoWcZFgLgRZOVLQHbz955izdD7AcmJwFd39LY7wZe0QGMgYyd6wSBDLRAY8LETjs0/7yEBXEaFd4OA1u6UV9jKQzLMDTQAHMMAz+QYS/VSA+4VIAiDCYmF/x87eOX+i24budpP2Uo5tOYflInsRvLLI9wXCGgroA3AvvyfADE2CA9RZ3xhhuvpgi7anUMsnXcA8gXmQkrEQEg/YAbaQaK+Bf4VggiamLLE4gINSh2y19QuPRkWqkpEsgBkQLiF8hGUg6nwJHANcAX8DV2giDFBN7wclIdCAwWvoTYObKTspHMGyoJNJCP1TqdhbBfyB5h0tSaxaiNyWYQEJxtUtG0fxlc8plHj7tatJsB3dFDarwG5LNCUR0BqwCbS4h5+BX2H6bVr9XDu5LlaFe6kbMQvHoqwFuCSjKuCeEGjugN/S0H6H2i9QewVTK7+LoZzd4qnE8ULXA/zqGmWnAF4R8JQkETn+BfRSgg/yCtS+AVPNs4gyJQIRga/rY4buGs3yFwQVQLMQjX8U5fRT1AHwj6QHWC2o1aCicoIZ4DAeaveG+/o2u2WFKhVIFJFU+A64kSzCFDEU678V+Yh7aANuKcNIEpube10P6JgBd+Um7VS/ScFn+gL8KGSz3CkmMm1E9OKBqgqlMtjW4MEi6Fg1oNLjsrwi1ixFE5OCzwxlBLl3xPI6Ft7MGMeZva9ie967NIBVBSoBHas3P8/td/zF8OX44pxgViAZF4x1Cox650yDDiFoh1W6+jo8oRxd8Cp8jZqqfNdUSrbIO07W0CIhmcrBaWB+9Z7q9Qn11Bp0ulki/zA+IAxOOZwdY/l23s5mn/fVrKHNnhoalFcx0ft3mE9vWH+6yhlB8PQvgNv+94xHXfbne6wHG6hIfX5HxbTiLIsk4XHwQL93yVrQ4ZncWPEflfCx0Payg31Mbdj0u2wt2nhhAxO66KAEPpSWc3Tg44yHWLcPeP5PbAAb0jeacv3r8P8AZLXIX+ucLtwAAAAASUVORK5CYII=" />
     <!--drag-->
     <img width="16" height="16" title="Mover" alt="" class="tool" style="-webkit-app-region: drag; cursor: pointer;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarY6xSsNQFEDPi6LiUCsEcXB4kygotupgxqQtRRCs1SHJ1qShSmkSXl7VfoSjWwcXd7/AyVFwUPwC/0Bx6uAQIYODCJ7p3MPlcsGo2HWnYZRhEGvVbjrS9Xw5+8QMUwDQCbPUbrUOAOIkjvjB5ysC4HnTrjsN/sZ8mCoNTIDtbpSFICpA/0KnGsQYMIN+qkHcAaY6addAPAClXu4vQCnI/Q0oKdfzQXwAZs/1fDDmADPIfQUwdXSpAWpJOlJnvVMtq5ZlSbubBJE8HmU6GmRyPw4TlSaqo6MukP8HwGK+2G46cq1qWXvr/DOu58vc3o8QgFh6LFpBOFTn3yqMnd/n4sZ4GQ5vYXpStN0ruNmAheuirVahvAX34y/Axk/96FpPYgAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAAxElEQVR42uyWQQrCMBREJ72KXk/BRePKdKNdFAXF8+kRpEsFYdwkCGlafvBnofigdNH8DGWmkxqSyOAI4ALgLJ4gKb32fFNL56SbbzlkoyXQMM1d8iYmw4N4oZEMVSjM7wlYhT3d2HfgSPYTiYiZWtfGMa39gwf16ILAkuU4VQDmBT2+gqSJeuZTnv5u46poBeZJTO59vSS7yCkIrP9d9H0CFsBtxJNG60x2iRTtNM/kEL/AQTpnMn9bFgBmAFaJ2CZ5DQCbvpZmBE5BPgAAAABJRU5ErkJggg==" />
     <!--error-->
@@ -62,7 +67,7 @@ $( window ).resize(function() {
     <img width="16" height="16" title="Ocultar lyrics" onclick="ipcRenderer.sendSync('closeLyrics', {});" alt="" class="tool" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarY6xSsNQFEDPi6LiUCsEcXB4kygotupgxqQtRRCs1SHJ1qShSmkSXl7VfoSjWwcXd7/AyVFwUPwC/0Bx6uAQIYODCJ7p3MPlcsGo2HWnYZRhEGvVbjrS9Xw5+8QMUwDQCbPUbrUOAOIkjvjB5ysC4HnTrjsN/sZ8mCoNTIDtbpSFICpA/0KnGsQYMIN+qkHcAaY6addAPAClXu4vQCnI/Q0oKdfzQXwAZs/1fDDmADPIfQUwdXSpAWpJOlJnvVMtq5ZlSbubBJE8HmU6GmRyPw4TlSaqo6MukP8HwGK+2G46cq1qWXvr/DOu58vc3o8QgFh6LFpBOFTn3yqMnd/n4sZ4GQ5vYXpStN0ruNmAheuirVahvAX34y/Axk/96FpPYgAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAA4UlEQVR42qSVQQ6CMBBFn8QTeFcNg3uNcFlu8N0MkZDaToefdFPgvXZg6EUSng+wAm/OZQRuwAMASUia9Yv5XGaMO84siSP8jGQscObBy3LMC7DOspRKu272SeVYcuVyJvsbM5Iq/CjolVgLXhJEJSH4P0FLEobXBDVJGN4SRCVTjRFpoCkLl8QQaCIlr7H/F/0bFiiRZUtkHS/ZegW1T7Gr40l2aFiSav8eSRYelpyBt561TXAG3pQMfkAf8/RTLZo3MBXmb9sKluTKaztZJHF1093bfu1ceWkneFXuAN8BAJn4LA6PX2sQAAAAAElFTkSuQmCC" />
   </div>
 
-  <pre id="lyrics" class="text-lyrics">
+  <pre id="lyrics" class="text-lyrics" style="background-color: rgba(0, 0, 0, 0.7)">
 
   </pre>
   <div id="search-lyrics" style="background: antiquewhite;">
@@ -89,18 +94,23 @@ $( window ).resize(function() {
   );
 
   var cont = 0;
-  var paleta = [{"color": "#DF0101"}, {"color": "#FFFF00"}, {"color": "#00FF00"}, {"color": "#0000FF"}, {"color": "#FE2EC8"}, {"color": "#151515"}];
+  var paleta = [{"color": "#DF0101", "background":"0" }, {"color": "#FFFF00", "background" : "1"}, {"color": "#00FF00" , "background":"1" }, {"color": "#0000FF" , "background":"0" }, {"color": "#FE2EC8" , "background":"1" }, {"color": "#151515", "background":"0" }];
   function getColor(){
     cont++;
     if(paleta.length <= cont){
       cont = 0;
     }
-    return paleta[cont].color;
+    return paleta[cont];
   }
 
   function corregir(){
-    $("#lyrics").hide();
-    $("#search-lyrics").show();
+    if($("#lyrics").is(":visible")){
+      $("#lyrics").hide();
+      $("#search-lyrics").show();
+    }else{
+      $("#lyrics").show();
+      $("#search-lyrics").hide();
+    }
     $("#busqueda").submit(function(e){
       e.preventDefault();
       $("#resultado").html("");
