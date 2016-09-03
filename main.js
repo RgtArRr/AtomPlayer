@@ -50,48 +50,6 @@ function createWindow() {
     eventRet.returnValue = '1'
   });
 
-  //Lyrics windows
-  var lyricsWindows =new BrowserWindow({
-    width: 500,
-    height: 400,
-    show: false,
-    movable: true,
-    alwaysOnTop: true,
-    frame: false,
-    fullscreenable: false,
-    transparent: true
-  });
-  lyricsWindows.loadURL(`file://${__dirname}/lyrics.html`);
-  lyricsWindows.hide();
-  //lyricsWindows.webContents.openDevTools();
-  lyricsWindows.setPosition(width-500, 45);
-
-  ipcMain.on('openLyrics', function(eventRet, arg) {
-    lyricsWindows.show();
-    lyricsWindows.webContents.send("lyrics", arg);
-    eventRet.returnValue = '1';
-  });
-
-  ipcMain.on('closeLyrics', function(eventRet, arg) {
-    lyricsWindows.hide();
-    eventRet.returnValue = '1';
-  });
-
-  ipcMain.on('scrollLyrics', function(eventRet, arg) {
-    lyricsWindows.webContents.send("scrollLyrics", arg.value);
-    eventRet.returnValue = '1';
-  });
-
-  ipcMain.on('registerLyrics', function(eventRet, arg) {
-    win.webContents.send("registerLyrics", arg);
-    eventRet.returnValue = '1';
-  });
-
-  ipcMain.on('activeLyrics', function(eventRet, arg) {
-    win.webContents.send("activeLyrics", arg);
-    eventRet.returnValue = '1';
-  });
-
   //Open Settings Window
   var settingsWindow;
   ipcMain.on('openSettings', function(eventRet, arg) {

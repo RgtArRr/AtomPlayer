@@ -20,6 +20,9 @@ tableList.draw($("#screen"));
 var ytdownloader = new YTdownloader();
 ytdownloader.draw($("#screen"));
 
+var lyrics = new Lyrics();
+lyrics.draw($("#screen"));
+
 //Create Shortcuts listener and config
 var config = db.getConfig()[0].values[0];
 ipcRenderer.sendSync('registerShortcut', {"key": ((config[0]!=0)?config[0]:"medianexttrack"), "channel": "medianexttrack"});
@@ -78,11 +81,11 @@ $("#add_Song").click(function(){
 });
 
 $("#home").click(function(){
-	toogleView("playlist");
+	toggleView("playlist");
 });
 
 $("#download").click(function(){
-	toogleView("ytdownload");
+	toggleView("ytdownload");
 });
 
 $("#minimize").click(function(){
@@ -91,6 +94,16 @@ $("#minimize").click(function(){
 
 $("#settings").click(function(){
 	ipcRenderer.sendSync('openSettings', {});
+});
+
+$("#toggleLyrics").click(function(){
+	$("#toggleLyrics").toggleClass("btn-active");
+	if($("#toggleLyrics").hasClass("btn-active")){
+		toggleView("lyrics");
+		lyrics.search_lyrics(player.songTitle.html(), player.lastIdSong);
+	}else{
+		toggleView("playlist");
+	}
 });
 
 ipcRenderer.on("registerLyrics", function(event, data){
@@ -163,7 +176,7 @@ $("#playlist_default").click(function(){
 			$("#canciones").append(tr);
 		});
 		//Change view
-		toogleView("playlist");
+		toggleView("playlist");
 	}
 });
 
@@ -434,30 +447,9 @@ function Player(){
 				$(k).addClass("currentSong");
 			}
 		});
-		if(hasLyrics){
-			var url_lyrics;
-			$.get("http://api.lyricsnmusic.com/songs?api_key=af12e83acd3975fdbd0f3d9b93cf4a&q="+title, function(data){
-				if(db.getLyrics(id_song)[0]){
-					url_lyrics = db.getLyrics(id_song)[0].values[0][1];
-				}else{
-					if(data[0]){
-						url_lyrics = data[0].url;
-					}
-				}
-				if(url_lyrics){
-					$.get(url_lyrics, function(data){
-						var page = $(data);
-						var lyrics = $(page.find("pre")[0]).html();
-						if(lyrics){
-							ipcRenderer.sendSync('openLyrics', {"data": lyrics, "id_song": id_song});
-						}else{
-							ipcRenderer.sendSync('openLyrics', {"data": "NO SE HA ENCONTRADO.", "id_song": id_song});
-						}
-					});
-				}else{
-					ipcRenderer.sendSync('openLyrics', {"data": "NO SE HA ENCONTRADO.", "id_song": id_song});
-				}
-			}, "json");
+
+		if($("#toggleLyrics").hasClass("btn-active")){
+			lyrics.search_lyrics(title, id_song);
 		}
 	};
 
@@ -555,19 +547,27 @@ function createNode(etiqueta, attr) {
 }
 
 //SPA, cambiar de vistas
-function toogleView(vista) {
+function toggleView(vista) {
+	ytdownloader.divContainer.hide();
+	tableList.divContainer.hide();
+	lyrics.container.tools.element.hide();
+	lyrics.container.lyrics.element.hide();
+	lyrics.container.search_lyrics.element.hide();
 	if (vista == "playlist") {
 		tableList.divContainer.show();
-		ytdownloader.divContainer.hide();
 		return;
 	}
 	if(vista == "ytdownload"){
-		tableList.divContainer.hide();
 		ytdownloader.divContainer.show();
 		return;
 	}
+	if(vista == "lyrics"){
+		lyrics.container.tools.element.show();
+		lyrics.container.lyrics.element.show();
+		lyrics.container.search_lyrics.element.hide();
+	}
 }
-toogleView("playlist");
+toggleView("playlist");
 
 //Evento cuando se borra un elemento
 (function ($) {
