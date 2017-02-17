@@ -37,9 +37,23 @@ function Database() {
     return this.readDB("select * from cancion where id_cancion < " + id_song + " and id_playlist = (select id_playlist from cancion where id_cancion="+id_song+") order by  id_cancion desc limit 1");
   };
 
+  var listSong = [];
+
   this.getRandomSong = function(id_song){
     var rows = this.readDB("select * from cancion where id_playlist = (select id_playlist from cancion where id_cancion="+id_song+")");
-    return rows[0].values[Math.floor(Math.random() * rows[0].values.length)];
+    if(listSong.length == rows[0].values.length){
+      listSong = [];
+    }
+    var b = true;
+    var returnSong;
+    while(b){
+      returnSong = rows[0].values[Math.floor(Math.random() * rows[0].values.length)];
+      if(listSong.indexOf(returnSong[0]) == -1){
+        listSong.push(returnSong[0]);
+        b = false;
+      }
+    }
+    return returnSong;
   };
 
   this.updateNameSong = function(id_song, newName){
@@ -63,6 +77,18 @@ function Database() {
 
   this.getConfig = function(){
     return this.readDB("SELECT * FROM config where 1 = 1");
+  }
+
+  this.getLyrics = function(id_song){
+    return this.readDB("SELECT * FROM lyrics where id_cancion='"+id_song+"'");
+  }
+
+  this.setLyrics = function(id_song, url){
+    this.writeDB("INSERT OR REPLACE INTO lyrics(id_cancion, url_lyrics) VALUES('"+id_song+"', '"+url+"')");
+  }
+
+  this.createTableLyrics = function(){
+    this.writeDB("CREATE table IF NOT EXISTS lyrics (id_cancion	INTEGER UNIQUE,url_lyrics TEXT)");
   }
 
   this.writeDB = function (query, values) {

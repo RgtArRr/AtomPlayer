@@ -21,17 +21,20 @@ function YTdownloader(){
 	this.divContainer.append(this.barProgress.container);
 
 	this.iscancelled = false;
+	this.isDownload = false;
 
 	this.draw = function(element){
 		this.barProgress.main.hide();
 
 		this.barProgress.back.click(function(){
 			self.iscancelled = true;
+			self.isDownload = false;
 			self.input.input.val("");
 			self.toogleView();
 		});
 
 		this.button.click(function(){
+			self.isDownload = true;
 			var url = urlObject({"url" : self.input.input.val()});
 			var idvideo = null;
 			switch(url.hostname) {

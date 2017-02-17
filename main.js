@@ -28,8 +28,9 @@ function createWindow() {
     win = null;
   });
 
+
+  const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
   win.on("minimize", function (){
-    const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
     if(win.getSize()[0] == 386 && win.getSize()[1] == 75){
       win.show();
     }
@@ -37,7 +38,6 @@ function createWindow() {
 
   //Toogle Basic and full mode
   ipcMain.on('toogleMode', function(eventRet, arg) {
-    const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
     if(win.getSize()[0] == 800 && win.getSize()[1] == 600){
       win.setSize(386, 75, true);
       win.setAlwaysOnTop(true);

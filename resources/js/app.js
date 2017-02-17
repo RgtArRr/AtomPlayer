@@ -9,6 +9,7 @@ const ipcRenderer = require('electron').ipcRenderer;
 
 var db = new Database();
 db.init();
+db.createTableLyrics();
 
 var player = new Player();
 player.draw($(".window-content"));
@@ -18,6 +19,9 @@ tableList.draw($("#screen"));
 
 var ytdownloader = new YTdownloader();
 ytdownloader.draw($("#screen"));
+
+var lyrics = new Lyrics();
+lyrics.draw($("#screen"));
 
 //Create Shortcuts listener and config
 var config = db.getConfig()[0].values[0];
@@ -41,6 +45,11 @@ ipcRenderer.on("mediaplaypause", function(){
 
 ipcRenderer.on("mediaprevioustrack", function(){
 	player.previousSong();
+});
+
+var hasLyrics = false;
+ipcRenderer.on("activeLyrics", function(){
+	hasLyrics = true;
 });
 
 $(document).keydown(function(e) {
@@ -72,11 +81,11 @@ $("#add_Song").click(function(){
 });
 
 $("#home").click(function(){
-	toogleView("playlist");
+	toggleView("playlist");
 });
 
 $("#download").click(function(){
-	toogleView("ytdownload");
+	toggleView("ytdownload");
 });
 
 $("#minimize").click(function(){
@@ -87,6 +96,19 @@ $("#settings").click(function(){
 	ipcRenderer.sendSync('openSettings', {});
 });
 
+$("#toggleLyrics").click(function(){
+	$("#toggleLyrics").toggleClass("btn-active");
+	if($("#toggleLyrics").hasClass("btn-active")){
+		toggleView("lyrics");
+		lyrics.search_lyrics(player.songTitle.html(), player.lastIdSong);
+	}else{
+		toggleView("playlist");
+	}
+});
+
+ipcRenderer.on("registerLyrics", function(event, data){
+	db.setLyrics(data.id_song, data.url);
+});
 
 //Temporal Playlist event
 //******
@@ -154,7 +176,7 @@ $("#playlist_default").click(function(){
 			$("#canciones").append(tr);
 		});
 		//Change view
-		toogleView("playlist");
+		toggleView("playlist");
 	}
 });
 
@@ -308,6 +330,8 @@ function Player(){
 				self.audioPlayer.get(0).currentTime = self.seekPlayer.value * this.duration;
 				self.seekPlayer = {status : 0};
 			}
+			//Temporalmente desactivado
+			//ipcRenderer.send("scrollLyrics", {"value": Math.round(this.currentTime / this.duration*100)});
 			self.progressBar.progress.attr("value", this.currentTime / this.duration);
 			self.progressBar.currentTime.html(sectostr(Math.round(this.currentTime)));
 		});
@@ -423,6 +447,10 @@ function Player(){
 				$(k).addClass("currentSong");
 			}
 		});
+
+		if($("#toggleLyrics").hasClass("btn-active")){
+			lyrics.search_lyrics(title, id_song);
+		}
 	};
 
 	this.nextSong = function(){
@@ -475,23 +503,25 @@ function Player(){
 //-----------------------------------------------------
 var lastUrl = ""
 setInterval(function(){
-	if(clipboard.readText() != lastUrl){
-		var url = urlObject({"url" : clipboard.readText()});
-		var idvideo = null;
-		switch(url.hostname) {
-			case "www.youtube.com":
-			case "youtube.com":
-			idvideo = url.parameters["v"];
-			break;
-			case "www.youtu.be":
-			case "youtu.be":
-			idvideo = url.pathname.split("/")[1];
-			break;
-			default:
-		}
-		if(idvideo){
-			ytdownloader.input.input.val(clipboard.readText());
-			lastUrl = clipboard.readText();
+	if(!ytdownloader.isDownload){
+		if(clipboard.readText() != lastUrl){
+			var url = urlObject({"url" : clipboard.readText()});
+			var idvideo = null;
+			switch(url.hostname) {
+				case "www.youtube.com":
+				case "youtube.com":
+				idvideo = url.parameters["v"];
+				break;
+				case "www.youtu.be":
+				case "youtu.be":
+				idvideo = url.pathname.split("/")[1];
+				break;
+				default:
+			}
+			if(idvideo){
+				ytdownloader.input.input.val(clipboard.readText());
+				lastUrl = clipboard.readText();
+			}
 		}
 	}
 }, 1000);
@@ -517,19 +547,27 @@ function createNode(etiqueta, attr) {
 }
 
 //SPA, cambiar de vistas
-function toogleView(vista) {
+function toggleView(vista) {
+	ytdownloader.divContainer.hide();
+	tableList.divContainer.hide();
+	lyrics.container.tools.element.hide();
+	lyrics.container.lyrics.element.hide();
+	lyrics.container.search_lyrics.element.hide();
 	if (vista == "playlist") {
 		tableList.divContainer.show();
-		ytdownloader.divContainer.hide();
 		return;
 	}
 	if(vista == "ytdownload"){
-		tableList.divContainer.hide();
 		ytdownloader.divContainer.show();
 		return;
 	}
+	if(vista == "lyrics"){
+		lyrics.container.tools.element.show();
+		lyrics.container.lyrics.element.show();
+		lyrics.container.search_lyrics.element.hide();
+	}
 }
-toogleView("playlist");
+toggleView("playlist");
 
 //Evento cuando se borra un elemento
 (function ($) {
