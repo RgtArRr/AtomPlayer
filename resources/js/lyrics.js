@@ -5,7 +5,7 @@ var lyricsHTML = '<div var="tools" style="position: absolute;top: 10px;right: 10
                   '</pre>'+
                   '<div var="search_lyrics" style="background: antiquewhite;margin: 5px;">'+
                     '<form var="formulario">'+
-                      '<textarea var="search_input" type="text" style="width: 80%;padding: 3px 0px 3px 10px;"></textareaz>'+
+                      '<textarea var="search_input" type="text" style="width: 80%;padding: 3px 0px 3px 10px;"></textarea>'+
                     '</form>'+
                     '<ul var="resultado">'+
                     '</ul>'+
