@@ -1,69 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>AtomPlayer</title>
-  <link rel="stylesheet" href="resources/css/bootstrap.gridSystem.min.css">
-  <link rel="stylesheet" href="resources/css/photon.min.css">
-  <link rel="stylesheet" href="resources/css/styles.css">
-  <link rel="stylesheet" href="resources/css/circle.css">
+    <meta charset="UTF-8">
+    <title>AtomPlayer</title>
+    <link rel="stylesheet" href="resources/css/bootstrap.gridSystem.min.css">
+    <link rel="stylesheet" href="resources/css/styles.css">
+    <link rel="stylesheet" href="resources/css/photon.min.css">
+    <link rel="stylesheet" href="resources/css/circle.css">
 </head>
 <body>
-  <div class="window">
-    <header class="toolbar toolbar-header" style="-webkit-app-region: drag">
-      <h1 class="title">AtomPlayer</h1>
-      <div class="toolbar-actions">
-        <div class="btn-group">
-          <button class="btn btn-default" id="home">
-            <span class="icon icon-home"></span>
-          </button>
-          <button class="btn btn-default" id="add_Song">
-            <span class="icon icon-folder"></span>
-          </button>
-          <button class="btn btn-default" id="download">
-            <span class="icon icon-download"></span>
-          </button>
-        </div>
-        <button class="btn btn-default pull-right" id="update">
-          <span class="icon icon-arrows-ccw"></span>&nbsp;Actualizar
-        </button>
-        <button class="btn btn-default pull-right" id="minimize">
-          <span class="icon icon-popup"></span>
-        </button>
-        <button class="btn btn-default pull-right" id="settings">
-          <span class="icon icon-cog"></span>
-        </button>
-      </div>
-    </header>
-    <div class="window-content">
-      <div class="pane-group">
-        <div class="pane pane-sm sidebar">
-          <nav class="nav-group">
-            <h5 class="nav-group-title">PlayList</h5>
-            <a class="nav-group-item active" id="playlist_default">
-              <span class="icon icon-home"></span>
-              Default
-            </a>
-          </nav>
-        </div>
-        <div class="pane" id="screen">
-
-        </div>
-      </div>
-    </div>
-
-    <footer class="toolbar toolbar-footer" style="min-height: 75px;-webkit-app-region: initial;">
-      <button class="btn" id="toggleLyrics"><span class="icon icon-note-beamed"></span>&nbsp;Letras</button>
-      <div class="toolbar-actions player">
-      </div>
-    </footer>
-  </div>
-  <script type="text/javascript" src="resources/js/keycode.js"></script>
-  <script type="text/javascript" src="resources/js/database.js"></script>
-  <script type="text/javascript" src="resources/js/downloader.js"></script>
-  <script type="text/javascript" src="resources/js/lyrics.js"></script>
-  <script type="text/javascript" src="resources/js/app.js"></script>
-  <script type="text/javascript" src="resources/js/updater.js"></script>
-  <script type="text/javascript" src="resources/js/prompt.js"></script>
+<div id="root"></div>
+<script type="text/javascript" src="resources/js/app.min.js"></script>
 </body>
 </html>
