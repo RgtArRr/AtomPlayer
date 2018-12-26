@@ -7,13 +7,13 @@ const fs = require('fs');
 const {dialog} = require('electron').remote;
 const {clipboard} = require('electron');
 const ipcRenderer = require('electron').ipcRenderer;
-const Database = require('./database.js');
-const {wk, rk} = require('./WeakKey.js');
+const Database = require('./utils/database.js');
+const {wk, rk} = require('./utils/WeakKey.js');
 
-import TableList from './TableList';
+import TableList from './componets/TableList';
+import PlayList from './componets/PlayList';
 
 const db = new Database();
-db.init();
 
 function MenuBoton (props) {
 	return (
@@ -26,8 +26,11 @@ function MenuBoton (props) {
 class App extends React.Component {
 	constructor (props) {
 		super(props);
+		this.state = {playlist: null};
+
 		this.homeAction = this.homeAction.bind(this);
 		this.folderAction = this.folderAction.bind(this);
+		this.onChangePlayList = this.onChangePlayList.bind(this);
 	}
 
 	homeAction () {
@@ -48,7 +51,7 @@ class App extends React.Component {
 					if (k.substr(k.length - 4) === '.mp3') {
 						let name = k.split(/(\\|\/)/g).pop();
 						name = name.substr(0, name.length - 4);
-						temp.push({type: 'song', path: k, name: name, playlist: 1});
+						temp.push({type: 'song', path: k, name: name, playlist: 0});
 					}
 				});
 				db.addSongs(temp);
@@ -56,10 +59,16 @@ class App extends React.Component {
 		});
 	}
 
+	onChangePlayList (_id) {
+		let state = this.state;
+		state.playlist = _id;
+		this.setState(state);
+	}
+
 	render () {
 		return (
 			[
-				<header key={rk()} className="toolbar toolbar-header" style={{WebkitAppRegion: 'drag'}}>
+				<header key={'main_toolbar'} className="toolbar toolbar-header" style={{WebkitAppRegion: 'drag'}}>
 					<h1 className="title">AtomPlayer</h1>
 					<div className="toolbar-actions">
 						<div className="btn-group">
@@ -73,23 +82,17 @@ class App extends React.Component {
 						<MenuBoton class="default pull-right" action={this.homeAction()} icon="cog"/>
 					</div>
 				</header>,
-				<div key={rk()} className="window-content" style={{height: '470px'}}>
+				<div key={'main_playlist'} className="window-content" style={{height: '470px'}}>
 					<div className="pane-group">
 						<div className="pane pane-sm sidebar">
-							<nav className="nav-group">
-								<h5 className="nav-group-title">PlayList</h5>
-								<a className="nav-group-item active" id="playlist_default">
-									<span className="icon icon-home"></span>
-									Default
-								</a>
-							</nav>
+							<PlayList db={db} onChangePlayList={() => { this.onChangePlayList();}}/>
 						</div>
 						<div className="pane" id="screen">
-							<TableList/>
+							/*<TableList playlist={this.state.playlist}/>*/
 						</div>
 					</div>
 				</div>,
-				<footer key={rk()} className="toolbar toolbar-footer"
+				<footer key={'main_footer'} className="toolbar toolbar-footer"
 				        style={{minHeight: '75px', WebkitAppRegion: 'initial'}}>
 					<button className="btn" id="toggleLyrics">
 						<span className="icon icon-note-beamed"></span>&nbsp;Letras
@@ -103,9 +106,11 @@ class App extends React.Component {
 	}
 }
 
-render((<App></App>),
-	document.getElementById('root'),
-);
+db.init(function () {
+	render((<App></App>),
+		document.getElementById('root'),
+	);
+});
 
 //#########################OLD CODE. WILL BE REMOVE SOON
 

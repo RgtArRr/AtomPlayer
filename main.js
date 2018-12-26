@@ -12,13 +12,22 @@ let win;
 
 function createWindow () {
 	// Create the browser window.
-	win = new BrowserWindow({icon: __dirname + '/icono.ico', width: 800, height: 600, frame: false, resizable: false});
+	let options = {icon: __dirname + '/icono.ico', width: 800, height: 600, resizable: false};
+	if (process.platform === 'darwin') {
+		options.titleBarStyle = 'hidden';
+	} else {
+		options.frame = false;
+	}
+	win = new BrowserWindow(options);
 
 	// and load the index.html of the app.
 	win.loadURL(`file://${__dirname}/index.html`);
 
 	// Open the DevTools.
 	win.webContents.openDevTools();
+
+	//https://electronjs.org/docs/tutorial/devtools-extension
+	BrowserWindow.addDevToolsExtension("/Users/kennethobregon/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.4.3_0")
 
 	// Emitted when the window is closed.
 	win.on('closed', () => {

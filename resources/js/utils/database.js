@@ -7,10 +7,53 @@ module.exports = function () {
 	this.db;
 
 	this.init = function (readyCallback) {
-		self.db = new Datastore({filename: fileDB, autoload: true});
-		if (readyCallback) {
-			readyCallback();
-		}
+		self.db = new Datastore({filename: fileDB});
+		self.db.loadDatabase(function () {
+			self.db.find({type: 'playlist'}, function (err, docs) {
+				if (docs.length === 0) {
+					self.db.insert({type: 'playlist', name: 'Default'});
+				}
+				if (readyCallback) {
+					readyCallback();
+				}
+			});
+
+		});
+	};
+
+	/*
+	[{
+	 type: 'playlist'
+	 name:
+	}]
+	*/
+
+	this.getPlayLists = function (responseCallback) {
+		self.db.find({type: 'playlist'}, function (err, docs) {
+			responseCallback(docs);
+		});
+	};
+
+	this.addPlayList = function (name, successCallback) {
+		this.db.insert({type: 'playlist', name: name}, function () {
+			successCallback();
+		});
+	};
+
+	this.changeNamePlayList = function (_id, name, successCallback) {
+		self.db.update({_id: _id}, {$set: {name: name}}, {}, function () {
+			successCallback();
+		});
+	};
+
+	this.deletePlayList = function (_id, successCallback) {
+		//delete songs on playlist
+		self.db.remove({playlist: _id}, {multi: true}, function (err, numRemoved) {
+			// delete playlist
+			self.db.remove({_id: _id}, {}, function (err, numRemoved) {
+				successCallback();
+			});
+		});
 	};
 
 	/*
@@ -100,4 +143,5 @@ module.exports = function () {
 	this.readDB = function (query) {
 		return this.db.exec(query);
 	};
-};
+}
+;

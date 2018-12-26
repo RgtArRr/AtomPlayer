@@ -1,6 +1,6 @@
 import React from 'react';
 
-const {wk, rk} = require('./WeakKey.js');
+const {wk, rk} = require('../utils/WeakKey.js');
 
 export default class TableList extends React.Component {
 	constructor (props) {
@@ -26,7 +26,9 @@ export default class TableList extends React.Component {
 				</table>
 				<table className="table-striped">
 					<tbody>
-
+					{/*{this.props.list.map((j, k) =>*/}
+						{/*<tr>k.name</tr>,*/}
+					{/*)}*/}
 					</tbody>
 				</table>
 			</div>
