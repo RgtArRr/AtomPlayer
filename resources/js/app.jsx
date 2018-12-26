@@ -1,5 +1,6 @@
 console.log(process.versions.electron);
 import React from 'react';
+
 import { render } from 'react-dom';
 
 const http = require('http');
@@ -9,8 +10,11 @@ const {clipboard} = require('electron');
 const ipcRenderer = require('electron').ipcRenderer;
 const Database = require('./utils/database.js');
 const {wk, rk} = require('./utils/WeakKey.js');
+const vex = require('vex-js');
+vex.registerPlugin(require('vex-dialog'));
+vex.defaultOptions.className = 'vex-theme-os';
 
-import TableList from './componets/TableList';
+import SongList from './componets/SongList';
 import PlayList from './componets/PlayList';
 
 const db = new Database();
@@ -28,6 +32,8 @@ class App extends React.Component {
 		super(props);
 		this.state = {playlist: null};
 
+		this.childSognList = React.createRef();
+
 		this.homeAction = this.homeAction.bind(this);
 		this.folderAction = this.folderAction.bind(this);
 		this.onChangePlayList = this.onChangePlayList.bind(this);
@@ -38,34 +44,43 @@ class App extends React.Component {
 	}
 
 	folderAction () {
-		dialog.showOpenDialog({
-			title: 'Escoge una musica',
-			properties: ['openFile', 'multiSelections'],
-			filters: [{name: 'Canciones', extensions: ['mp3']}],
-		}, function (e) {
-			if (e) {
-				let temp = [];
-				e.forEach(function (k) {
-					//Check extension file
-					//TODO: support more audio extensions files
-					if (k.substr(k.length - 4) === '.mp3') {
-						let name = k.split(/(\\|\/)/g).pop();
-						name = name.substr(0, name.length - 4);
-						temp.push({type: 'song', path: k, name: name, playlist: 0});
-					}
-				});
-				db.addSongs(temp);
-			}
-		});
+		let self = this;
+		if (self.state.playlist !== null) {
+			dialog.showOpenDialog({
+				title: 'Escoge una musica',
+				properties: ['openFile', 'multiSelections'],
+				filters: [{name: 'Canciones', extensions: ['mp3']}],
+			}, function (e) {
+				if (e) {
+					let temp = [];
+					e.forEach(function (k) {
+						//TODO: support more audio extensions files
+						//Check extension file
+						if (k.substr(k.length - 4) === '.mp3') {
+							let name = k.split(/(\\|\/)/g).pop();
+							name = name.substr(0, name.length - 4);
+							temp.push({type: 'song', path: k, name: name, playlist: self.state.playlist});
+						}
+					});
+					db.addSongs(temp);
+				}
+			});
+		} else {
+			vex.dialog.alert('Seleccione una playlist');
+		}
 	}
 
 	onChangePlayList (_id) {
 		let state = this.state;
 		state.playlist = _id;
-		this.setState(state);
+		this.setState(state, function () {
+			//trigger for update song list
+			this.childSognList.current.updateSongs();
+		});
 	}
 
 	render () {
+		console.log('render app');
 		return (
 			[
 				<header key={'main_toolbar'} className="toolbar toolbar-header" style={{WebkitAppRegion: 'drag'}}>
@@ -85,10 +100,11 @@ class App extends React.Component {
 				<div key={'main_playlist'} className="window-content" style={{height: '470px'}}>
 					<div className="pane-group">
 						<div className="pane pane-sm sidebar">
-							<PlayList db={db} onChangePlayList={() => { this.onChangePlayList();}}/>
+							<PlayList db={db} vex={vex} onChangePlayList={this.onChangePlayList}
+							          playlist={this.state.playlist}/>
 						</div>
 						<div className="pane" id="screen">
-							/*<TableList playlist={this.state.playlist}/>*/
+							<SongList db={db} vex={vex} ref={this.childSognList} playlist={this.state.playlist}/>
 						</div>
 					</div>
 				</div>,

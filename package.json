@@ -11,13 +11,12 @@
   },
   "dependencies": {
     "nedb": "^1.8.0",
-    "react": "^16.5.0",
+    "react": "^16.7.0",
     "react-contextmenu": "^2.10.0",
-    "react-dom": "^16.5.0",
+    "react-dom": "^16.7.0",
     "vex-js": "^4.1.0"
   },
   "devDependencies": {
-    "electron": "^3.0.11",
     "babel-core": "^6.7.6",
     "babel-loader": "^6.2.4",
     "babel-minify-webpack-plugin": "^0.3.1",
@@ -26,6 +25,7 @@
     "babel-preset-react": "^6.5.0",
     "babel-preset-stage-0": "^6.5.0",
     "cross-env": "^5.2.0",
+    "electron": "^4.0.0",
     "webpack": "^2.1.0-beta.22"
   },
   "repository": {

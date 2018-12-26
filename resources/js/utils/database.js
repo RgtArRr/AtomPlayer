@@ -7,7 +7,7 @@ module.exports = function () {
 	this.db;
 
 	this.init = function (readyCallback) {
-		self.db = new Datastore({filename: fileDB});
+		self.db = new Datastore({filename: fileDB, timestampData: true});
 		self.db.loadDatabase(function () {
 			self.db.find({type: 'playlist'}, function (err, docs) {
 				if (docs.length === 0) {
@@ -29,7 +29,7 @@ module.exports = function () {
 	*/
 
 	this.getPlayLists = function (responseCallback) {
-		self.db.find({type: 'playlist'}, function (err, docs) {
+		self.db.find({type: 'playlist'}).sort({createdAt: 1}).exec(function (err, docs) {
 			responseCallback(docs);
 		});
 	};
@@ -68,8 +68,22 @@ module.exports = function () {
 		this.db.insert(songs);
 	};
 
-	this.getSongs = function (id_playlist) {
-		// return this.readDB('SELECT * FROM cancion where id_playlist=\'' + id_playlist + '\'');
+	this.getSongs = function (playlist, responseCallback) {
+		self.db.find({type: 'song', playlist: playlist}).sort({createdAt: 1}).exec(function (err, docs) {
+			responseCallback(docs);
+		});
+	};
+
+	this.changeNameSong = function (_id, name, successCallback) {
+		self.db.update({_id: _id}, {$set: {name: name}}, {}, function () {
+			successCallback();
+		});
+	};
+
+	this.deleteSong = function (_id, successCallback) {
+		self.db.remove({_id: _id}, {}, function (err, numRemoved) {
+			successCallback();
+		});
 	};
 
 	this.getNextSong = function (id_song) {
@@ -102,10 +116,6 @@ module.exports = function () {
 		// if (row[0].values[0][3] == 0) {
 		// 	this.writeDB('UPDATE cancion SET duracion = ? WHERE id_cancion = ?', [duration, id_song]);
 		// }
-	};
-
-	this.deleteSong = function (id_song) {
-		// this.writeDB('DELETE FROM cancion where id_cancion = \'' + id_song + '\'');
 	};
 
 	this.setConfig = function (key, value) {
