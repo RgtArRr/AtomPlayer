@@ -16,6 +16,7 @@ vex.defaultOptions.className = 'vex-theme-os';
 
 import SongList from './componets/SongList';
 import PlayList from './componets/PlayList';
+import Player from './componets/Player';
 
 const db = new Database();
 
@@ -114,6 +115,7 @@ class App extends React.Component {
 						<span className="icon icon-note-beamed"></span>&nbsp;Letras
 					</button>
 					<div className="toolbar-actions player">
+						<Player/>
 					</div>
 				</footer>,
 			]
