@@ -87,12 +87,9 @@ td {
 }
 
 .volumen_range {
-    position: absolute;
-    left: 160px;
-    bottom: 81px;
+    padding: 5px;
     border: 0px !important;
     background: transparent;
-    -webkit-transform: rotate(270deg);
 }
 
 .song_title {
@@ -239,7 +236,7 @@ input[type=range]:focus {
 
     input[type=range] {
         -webkit-appearance: none;
-        width: 50px;
+        width: 90px;
     }
 
     input[type=range]::-webkit-slider-runnable-track {
@@ -262,15 +259,6 @@ input[type=range]:focus {
 
     input[type=range]:focus {
         outline: none;
-    }
-
-    .volumen_range {
-        position: absolute;
-        left: 185px;
-        bottom: 56px;
-        border: 0px !important;
-        background: transparent;
-        -webkit-transform: rotate(270deg);
     }
 
     .maximize {

@@ -77,7 +77,7 @@ export default class SongList extends React.Component {
 						<tbody>
 						{this.state.data.map((k, j) =>
 								<tr key={k._id}>
-									<td>
+									<td onDoubleClick={() => {this.props.ondblclickSong(k._id);}}>
 										<ContextMenuTrigger key={k._id} id="contexmenu_song" collect={collect} data={k}>
 											{k.name}
 										</ContextMenuTrigger>

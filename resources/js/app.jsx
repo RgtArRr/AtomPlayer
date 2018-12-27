@@ -34,10 +34,13 @@ class App extends React.Component {
 		this.state = {playlist: null};
 
 		this.childSognList = React.createRef();
+		this.childPlayer = React.createRef();
 
 		this.homeAction = this.homeAction.bind(this);
 		this.folderAction = this.folderAction.bind(this);
 		this.onChangePlayList = this.onChangePlayList.bind(this);
+		this.ondblclickSong = this.ondblclickSong.bind(this);
+		this.toggleWindowSize = this.toggleWindowSize.bind(this);
 	}
 
 	homeAction () {
@@ -80,6 +83,15 @@ class App extends React.Component {
 		});
 	}
 
+	ondblclickSong (_id) {
+		console.log(_id);
+		this.childPlayer.current.loadSong(_id);
+	}
+
+	toggleWindowSize () {
+		ipcRenderer.sendSync('toogleMode', {});
+	}
+
 	render () {
 		console.log('render app');
 		return (
@@ -94,28 +106,29 @@ class App extends React.Component {
 						</div>
 						<MenuBoton class="default pull-right" action={this.homeAction()} icon="arrows-ccw"
 						           text={'Actualizar'}/>
-						<MenuBoton class="default pull-right" action={this.homeAction()} icon="popup"/>
+						<MenuBoton class="default pull-right" action={this.toggleWindowSize} icon="popup"/>
 						<MenuBoton class="default pull-right" action={this.homeAction()} icon="cog"/>
 					</div>
 				</header>,
 				<div key={'main_playlist'} className="window-content" style={{height: '470px'}}>
 					<div className="pane-group">
 						<div className="pane pane-sm sidebar">
-							<PlayList db={db} vex={vex} onChangePlayList={this.onChangePlayList}
-							          playlist={this.state.playlist}/>
+							<PlayList db={db} vex={vex} playlist={this.state.playlist}
+							          onChangePlayList={this.onChangePlayList}/>
 						</div>
 						<div className="pane" id="screen">
-							<SongList db={db} vex={vex} ref={this.childSognList} playlist={this.state.playlist}/>
+							<SongList db={db} vex={vex} playlist={this.state.playlist} ref={this.childSognList}
+							          ondblclickSong={this.ondblclickSong}/>
 						</div>
 					</div>
 				</div>,
 				<footer key={'main_footer'} className="toolbar toolbar-footer"
-				        style={{minHeight: '75px', WebkitAppRegion: 'initial'}}>
+				        style={{minHeight: '75px', WebkitAppRegion: 'no-drag'}}>
 					<button className="btn" id="toggleLyrics">
 						<span className="icon icon-note-beamed"></span>&nbsp;Letras
 					</button>
 					<div className="toolbar-actions player">
-						<Player/>
+						<Player db={db} ref={this.childPlayer} toggleWindowSize={this.toggleWindowSize}/>
 					</div>
 				</footer>,
 			]

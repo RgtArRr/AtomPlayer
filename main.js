@@ -1,8 +1,5 @@
 const electron = require('electron');
-// Module to control application life.
-const {app, globalShortcut} = electron;
-// Module to create native browser window.
-const {BrowserWindow} = electron;
+const {app, globalShortcut, BrowserWindow} = electron;
 
 const ipcMain = electron.ipcMain;
 
@@ -37,23 +34,21 @@ function createWindow () {
 		win = null;
 	});
 
-	const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
 	win.on('minimize', function () {
-		if (win.getSize()[0] == 386 && win.getSize()[1] == 75) {
+		if (win.getSize()[0] === 386 && win.getSize()[1] === 75) {
 			win.show();
 		}
 	});
 
+	let {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
 	//Toogle Basic and full mode
 	ipcMain.on('toogleMode', function (eventRet, arg) {
-		if (win.getSize()[0] == 800 && win.getSize()[1] == 600) {
-			win.setSize(386, 75, true);
+		if (win.getSize()[0] === 800 && win.getSize()[1] === 600) {
+			win.setBounds({x: width - 386, y: height - 75, width: 400, height: 75});
 			win.setAlwaysOnTop(true);
-			win.setPosition(width - 386, height - 75);
 		} else {
-			win.setSize(800, 600, true);
+			win.setBounds({x: Math.round(width / 2 - 400), y: Math.round(height / 2 - 300), width: 800, height: 600});
 			win.setAlwaysOnTop(false);
-			win.setPosition(width / 2 - 400, height / 2 - 300);
 		}
 		eventRet.returnValue = '1';
 	});
@@ -61,72 +56,43 @@ function createWindow () {
 	//Open Settings Window
 	var settingsWindow;
 	ipcMain.on('openSettings', function (eventRet, arg) {
-		var settingsWindow = new BrowserWindow({
-			parent: win,
-			width: 500,
-			height: 400,
-			show: false,
-			resizable: false,
-			movable: false,
-			alwaysOnTop: false,
-			frame: false,
-		});
-		settingsWindow.loadURL(`file://${__dirname}/settings.html`);
-		settingsWindow.show();
-		settingsWindow.webContents.openDevTools();
-		settingsWindow.on('closed', function () {
-			settingsWindow = null;
-		});
+		// var settingsWindow = new BrowserWindow({
+		// 	parent: win,
+		// 	width: 500,
+		// 	height: 400,
+		// 	show: false,
+		// 	resizable: false,
+		// 	movable: false,
+		// 	alwaysOnTop: false,
+		// 	frame: false,
+		// });
+		// settingsWindow.loadURL(`file://${__dirname}/settings.html`);
+		// settingsWindow.show();
+		// settingsWindow.webContents.openDevTools();
+		// settingsWindow.on('closed', function () {
+		// 	settingsWindow = null;
+		// });
 		eventRet.returnValue = '1';
-	});
-
-	//support prompt()
-	var promptResponse;
-	ipcMain.on('prompt', function (eventRet, arg) {
-		promptResponse = null;
-		var promptWindow = new BrowserWindow({
-			width: 400,
-			height: 100,
-			show: false,
-			resizable: false,
-			movable: false,
-			alwaysOnTop: true,
-			frame: false,
-		});
-		arg.val = arg.val || '';
-		const promptHtml = '<label for="val">' + arg.title + '</label><input id="val" value="' + arg.val +
-			'" autofocus /><button onclick="require(\'electron\').ipcRenderer.send(\'prompt-response\', document.getElementById(\'val\').value);window.close()">Aceptar</button><button onclick="window.close()">Cancelar</button><style>body {font-family: sans-serif;} button {float:right; margin-left: 10px;} label,input {margin-bottom: 10px; width: 100%; display:block;}</style>';
-		promptWindow.loadURL('data:text/html,' + promptHtml);
-		promptWindow.show();
-		promptWindow.on('closed', function () {
-			eventRet.returnValue = promptResponse;
-			promptWindow = null;
-		});
-	});
-
-	ipcMain.on('prompt-response', function (event, arg) {
-		if (arg === '') { arg = null; }
-		promptResponse = arg;
 	});
 
 	//Register shortcut
 	ipcMain.on('registerShortcut', function (event, arg) {
-		console.log(arg.key, arg.channel);
-		var response = '1';
-		try {
-			var shortcut = globalShortcut.register(arg.key, () => {
-				win.webContents.send(arg.channel, true);
-			});
-			if (!shortcut) {
-				response = '0';
-				console.log('shortcut failed' + arg[0]);
-			}
-		}
-		catch (err) {
-			response = '0';
-			console.log(err);
-		}
-		event.returnValue = response;
+		// console.log(arg.key, arg.channel);
+		// var response = '1';
+		// try {
+		// 	var shortcut = globalShortcut.register(arg.key, () => {
+		// 		win.webContents.send(arg.channel, true);
+		// 	});
+		// 	if (!shortcut) {
+		// 		response = '0';
+		// 		console.log('shortcut failed' + arg[0]);
+		// 	}
+		// }
+		// catch (err) {
+		// 	response = '0';
+		// 	console.log(err);
+		// }
+		// event.returnValue = response;
 	});
 }
 
@@ -162,7 +128,7 @@ var options = [
 	//'enable-universal-accelerated-overflow-scroll',
 	//'allow-file-access-from-files',
 	//'allow-insecure-websocket-from-https-origin',
-	['js-flags', '--harmony_collections'],
+	['js-flags'],
 ];
 
 for (var i = 0; i < options.length; ++i) {

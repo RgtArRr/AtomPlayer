@@ -74,6 +74,12 @@ module.exports = function () {
 		});
 	};
 
+	this.getSong = function (_id, responseCallback) {
+		self.db.findOne({_id: _id}, function (err, docs) {
+			responseCallback(docs);
+		});
+	};
+
 	this.changeNameSong = function (_id, name, successCallback) {
 		self.db.update({_id: _id}, {$set: {name: name}}, {}, function () {
 			successCallback();
@@ -86,29 +92,39 @@ module.exports = function () {
 		});
 	};
 
-	this.getNextSong = function (id_song) {
-		// return this.readDB('select * from cancion where id_cancion > ' + id_song +
-		// 	' and id_playlist = (select id_playlist from cancion where id_cancion=' + id_song + ') limit 1');
+	this.__getSongs = function (_id, type, successCallback) {
+		self.getSong(_id, function (song) {
+			if (song !== null) {
+				self.getSongs(song.playlist, function (songs) {
+					let index = songs.findIndex(k => k._id === _id);
+					let target;
+					if (type === 'next') {
+						target = index + 1;
+					}
+					if (type === 'prev') {
+						target = index - 1;
+					}
+					if (type === 'rand') {
+						target = Math.floor(Math.random() * songs.length);
+					}
+					if (typeof songs[target] !== 'undefined') {
+						successCallback(songs[target]);
+					}
+				});
+			}
+		});
 	};
 
-	this.getPreviousSong = function (id_song) {
-		// return this.readDB('select * from cancion where id_cancion < ' + id_song +
-		// 	' and id_playlist = (select id_playlist from cancion where id_cancion=' + id_song +
-		// 	') order by  id_cancion desc limit 1');
+	this.getNextSong = function (_id, successCallback) {
+		this.__getSongs(_id, 'next', successCallback);
 	};
 
-	var listSong = [];
-
-	this.getRandomSong = function (id_song) {
-		// var rows = this.readDB(
-		// 	'select * from cancion where id_playlist = (select id_playlist from cancion where id_cancion=' + id_song
-		// + ')'); if (listSong.length == rows[0].values.length) { listSong = []; } var b = true; var returnSong; while
-		// (b) { returnSong = rows[0].values[Math.floor(Math.random() * rows[0].values.length)]; if
-		// (listSong.indexOf(returnSong[0]) == -1) { listSong.push(returnSong[0]); b = false; } } return returnSong;
+	this.getPrevSong = function (_id, successCallback) {
+		this.__getSongs(_id, 'prev', successCallback);
 	};
 
-	this.updateNameSong = function (id_song, newName) {
-		// this.writeDB('UPDATE cancion SET nombre = ? WHERE id_cancion = ?', [newName, id_song]);
+	this.getRandomSong = function (_id, successCallback) {
+		this.__getSongs(_id, 'rand', successCallback);
 	};
 
 	this.updateDuratioSong = function (id_song, duration) {
@@ -135,23 +151,6 @@ module.exports = function () {
 	this.setLyrics = function (id_song, url) {
 		// this.writeDB(
 		// 	'INSERT OR REPLACE INTO lyrics(id_cancion, url_lyrics) VALUES(\'' + id_song + '\', \'' + url + '\')');
-	};
-
-	this.writeDB = function (query, values) {
-		// let res = null;
-		// if (values) {
-		// 	this.db.run(query, values);
-		// } else {
-		// 	res = this.db.exec(query);
-		// }
-		// let data = this.db.export();
-		// let buffer = new Buffer(data);
-		// fs.writeFileSync(fileDB, buffer);
-		// return res;
-	};
-
-	this.readDB = function (query) {
-		return this.db.exec(query);
 	};
 }
 ;
