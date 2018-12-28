@@ -9,7 +9,11 @@ let win;
 
 function createWindow () {
 	// Create the browser window.
-	let options = {icon: __dirname + '/icono.ico', width: 800, height: 600, resizable: false};
+	let options = {
+		icon: __dirname + '/icono.png', width: 800, height: 600, resizable: false, webPreferences: {
+			nodeIntegration: true,
+		},
+	};
 	if (process.platform === 'darwin') {
 		options.titleBarStyle = 'hidden';
 	} else {

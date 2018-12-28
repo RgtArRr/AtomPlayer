@@ -8,10 +8,11 @@ function collect (props) {
 export default class SongList extends React.Component {
 	constructor (props) {
 		super(props);
-		this.state = {data: []};
+		this.state = {data: [], current: null};
 
 		this.updateSongs = this.updateSongs.bind(this);
 		this.handleClick = this.handleClick.bind(this);
+		this.ondblclickSong = this.ondblclickSong.bind(this);
 	}
 
 	componentDidMount () {
@@ -61,10 +62,17 @@ export default class SongList extends React.Component {
 		}
 	}
 
+	ondblclickSong (_id) {
+		let state = this.state;
+		state.current = _id;
+		this.setState(state);
+		this.props.ondblclickSong(_id);
+	}
+
 	render () {
 		return (
 			[
-				<div className="table-wrapper fill">
+				<div key={'div_table'} className="table-wrapper fill">
 					<table>
 						<thead>
 						<tr>
@@ -76,8 +84,8 @@ export default class SongList extends React.Component {
 					<table className="table-striped">
 						<tbody>
 						{this.state.data.map((k, j) =>
-								<tr key={k._id}>
-									<td onDoubleClick={() => {this.props.ondblclickSong(k._id);}}>
+								<tr key={k._id} className={this.state.current === k._id ? 'song_selected' : ''}>
+									<td onDoubleClick={() => {this.ondblclickSong(k._id);}}>
 										<ContextMenuTrigger key={k._id} id="contexmenu_song" collect={collect} data={k}>
 											{k.name}
 										</ContextMenuTrigger>

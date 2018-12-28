@@ -67,12 +67,19 @@ export default class Player extends React.Component {
 		this.props.db.getSong(_id, function (song) {
 			if (song !== null) {
 				let state = self.state;
+				console.log(song);
 				self.audioPlayer.current.src = song.path;
 				self.audioPlayer.current.load();
 				state.title = song.name;
 				state._id = song._id;
-				self.setState(state);
-				self.play();
+				state.playing = false;
+				self.setState(state, function () {
+					self.play();
+				});
+				//update song list
+				let _state = self.props.songlist.current.state;
+				_state.current = song._id;
+				self.props.songlist.current.setState(_state);
 			}
 		});
 	}
@@ -128,7 +135,7 @@ export default class Player extends React.Component {
 		let state = this.state;
 		state.volumen = e.target.value;
 		this.setState(state);
-		this.audioPlayer.current = e.target.value;
+		this.audioPlayer.current.volumen = e.target.value;
 	}
 
 	toggleVolumen () {
@@ -146,11 +153,15 @@ export default class Player extends React.Component {
 	render () {
 		return (
 			[
-				<div className="player">
+				<div key={'div_player'} className="player">
 					<ul id="progress_song">
 						<li>{sectostr(Math.round(this.state.currentTime))}</li>
-						<progress value={this.state.currentTime / this.state.totalTime} onClick={this.seek}
-						          max="1" style={{width: '90%'}}></progress>
+						<progress
+							max={'1'}
+							onClick={this.seek}
+							style={{width: '90%'}}
+							value={this.state.currentTime / (this.state.totalTime === 0 ? 1 : this.state.totalTime)}
+						></progress>
 						<li>{sectostr(Math.round(this.state.totalTime))}</li>
 					</ul>
 					<button className="btn btn-default" onClick={() => {this.changeSong('prev');}}>
@@ -181,7 +192,7 @@ export default class Player extends React.Component {
 					</button>
 					<span className="song_title">{this.state.title}</span>
 				</div>,
-				<audio src="" ref={this.audioPlayer}></audio>,
+				<audio key={'audio_player'} src="" ref={this.audioPlayer}></audio>,
 			]
 		);
 	}

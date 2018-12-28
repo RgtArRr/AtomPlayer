@@ -33,7 +33,7 @@ class App extends React.Component {
 		super(props);
 		this.state = {playlist: null};
 
-		this.childSognList = React.createRef();
+		this.childSongList = React.createRef();
 		this.childPlayer = React.createRef();
 
 		this.homeAction = this.homeAction.bind(this);
@@ -79,12 +79,11 @@ class App extends React.Component {
 		state.playlist = _id;
 		this.setState(state, function () {
 			//trigger for update song list
-			this.childSognList.current.updateSongs();
+			this.childSongList.current.updateSongs();
 		});
 	}
 
 	ondblclickSong (_id) {
-		console.log(_id);
 		this.childPlayer.current.loadSong(_id);
 	}
 
@@ -117,7 +116,7 @@ class App extends React.Component {
 							          onChangePlayList={this.onChangePlayList}/>
 						</div>
 						<div className="pane" id="screen">
-							<SongList db={db} vex={vex} playlist={this.state.playlist} ref={this.childSognList}
+							<SongList db={db} vex={vex} playlist={this.state.playlist} ref={this.childSongList}
 							          ondblclickSong={this.ondblclickSong}/>
 						</div>
 					</div>
@@ -128,7 +127,8 @@ class App extends React.Component {
 						<span className="icon icon-note-beamed"></span>&nbsp;Letras
 					</button>
 					<div className="toolbar-actions player">
-						<Player db={db} ref={this.childPlayer} toggleWindowSize={this.toggleWindowSize}/>
+						<Player db={db} ref={this.childPlayer} toggleWindowSize={this.toggleWindowSize}
+						        songlist={this.childSongList}/>
 					</div>
 				</footer>,
 			]
