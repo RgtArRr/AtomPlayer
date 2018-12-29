@@ -17,6 +17,7 @@ vex.defaultOptions.className = 'vex-theme-os';
 import SongList from './componets/SongList';
 import PlayList from './componets/PlayList';
 import Player from './componets/Player';
+import YTdownloader from './componets/YTdownloader';
 
 const db = new Database();
 
@@ -115,9 +116,10 @@ class App extends React.Component {
 							<PlayList db={db} vex={vex} playlist={this.state.playlist}
 							          onChangePlayList={this.onChangePlayList}/>
 						</div>
-						<div className="pane" id="screen">
-							<SongList db={db} vex={vex} playlist={this.state.playlist} ref={this.childSongList}
-							          ondblclickSong={this.ondblclickSong}/>
+						<div className="pane">
+							{/*<SongList db={db} vex={vex} playlist={this.state.playlist} ref={this.childSongList}*/}
+							          {/*ondblclickSong={this.ondblclickSong}/>*/}
+							<YTdownloader/>
 						</div>
 					</div>
 				</div>,

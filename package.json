@@ -10,11 +10,13 @@
     "react_build": "webpack -p"
   },
   "dependencies": {
+    "ffmpeg-static-electron": "^2.0.1",
     "nedb": "^1.8.0",
     "react": "^16.7.0",
     "react-contextmenu": "^2.10.0",
     "react-dom": "^16.7.0",
-    "vex-js": "^4.1.0"
+    "vex-js": "^4.1.0",
+    "youtube-mp3-downloader": "^0.5.3"
   },
   "devDependencies": {
     "babel-core": "^6.7.6",

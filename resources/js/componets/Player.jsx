@@ -67,7 +67,6 @@ export default class Player extends React.Component {
 		this.props.db.getSong(_id, function (song) {
 			if (song !== null) {
 				let state = self.state;
-				console.log(song);
 				self.audioPlayer.current.src = song.path;
 				self.audioPlayer.current.load();
 				state.title = song.name;
