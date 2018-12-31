@@ -28,7 +28,8 @@ function createWindow () {
 	win.webContents.openDevTools();
 
 	//https://electronjs.org/docs/tutorial/devtools-extension
-	BrowserWindow.addDevToolsExtension("/Users/kennethobregon/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.4.3_0")
+	BrowserWindow.addDevToolsExtension(
+		'/home/desarrollo03/.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.4.3_0');
 
 	// Emitted when the window is closed.
 	win.on('closed', () => {
@@ -58,45 +59,48 @@ function createWindow () {
 	});
 
 	//Open Settings Window
-	var settingsWindow;
+	let settingsWindow;
 	ipcMain.on('openSettings', function (eventRet, arg) {
-		// var settingsWindow = new BrowserWindow({
-		// 	parent: win,
-		// 	width: 500,
-		// 	height: 400,
-		// 	show: false,
-		// 	resizable: false,
-		// 	movable: false,
-		// 	alwaysOnTop: false,
-		// 	frame: false,
-		// });
-		// settingsWindow.loadURL(`file://${__dirname}/settings.html`);
-		// settingsWindow.show();
-		// settingsWindow.webContents.openDevTools();
-		// settingsWindow.on('closed', function () {
-		// 	settingsWindow = null;
-		// });
+		let settingsWindow = new BrowserWindow({
+			parent: win,
+			width: 500,
+			height: 400,
+			show: false,
+			resizable: false,
+			movable: false,
+			alwaysOnTop: false,
+			frame: false,
+			webPreferences: {
+				nodeIntegration: true,
+			},
+		});
+		settingsWindow.loadURL(`file://${__dirname}/settings.html`);
+		settingsWindow.show();
+		settingsWindow.webContents.openDevTools();
+		settingsWindow.on('closed', function () {
+			settingsWindow = null;
+		});
 		eventRet.returnValue = '1';
 	});
 
 	//Register shortcut
 	ipcMain.on('registerShortcut', function (event, arg) {
-		// console.log(arg.key, arg.channel);
-		// var response = '1';
-		// try {
-		// 	var shortcut = globalShortcut.register(arg.key, () => {
-		// 		win.webContents.send(arg.channel, true);
-		// 	});
-		// 	if (!shortcut) {
-		// 		response = '0';
-		// 		console.log('shortcut failed' + arg[0]);
-		// 	}
-		// }
-		// catch (err) {
-		// 	response = '0';
-		// 	console.log(err);
-		// }
-		// event.returnValue = response;
+		console.log(arg.key, arg.channel);
+		let response = '1';
+		try {
+			let shortcut = globalShortcut.register(arg.key, () => {
+				win.webContents.send(arg.channel, true);
+			});
+			if (!shortcut) {
+				response = '0';
+				console.log('shortcut failed' + arg[0]);
+			}
+		}
+		catch (err) {
+			response = '0';
+			console.log(err);
+		}
+		event.returnValue = response;
 	});
 }
 

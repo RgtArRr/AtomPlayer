@@ -8,8 +8,8 @@ const fs = require('fs');
 const {dialog} = require('electron').remote;
 const {clipboard} = require('electron');
 const ipcRenderer = require('electron').ipcRenderer;
-const Database = require('./utils/database.js');
-const {wk, rk} = require('./utils/WeakKey.js');
+const Database = require('./utils/database');
+const {wk, rk} = require('./utils/WeakKey');
 const vex = require('vex-js');
 vex.registerPlugin(require('vex-dialog'));
 vex.defaultOptions.className = 'vex-theme-os';
@@ -39,10 +39,26 @@ class App extends React.Component {
 
 		this.homeAction = this.homeAction.bind(this);
 		this.donwloadAction = this.donwloadAction.bind(this);
+		this.settingAction = this.settingAction.bind(this);
+
 		this.folderAction = this.folderAction.bind(this);
 		this.onChangePlayList = this.onChangePlayList.bind(this);
 		this.ondblclickSong = this.ondblclickSong.bind(this);
 		this.toggleWindowSize = this.toggleWindowSize.bind(this);
+	}
+
+	componentDidMount () {
+		ipcRenderer.on('medianexttrack', function () {
+			this.childPlayer.current.changeSong('next');
+		});
+
+		ipcRenderer.on('mediaplaypause', function () {
+			this.childPlayer.current.play();
+		});
+
+		ipcRenderer.on('mediaprevioustrack', function () {
+			this.childPlayer.current.changeSong('prev');
+		});
 	}
 
 	homeAction () {
@@ -55,6 +71,10 @@ class App extends React.Component {
 		let state = this.state;
 		state.window = 'download';
 		this.setState(state);
+	}
+
+	settingAction () {
+		ipcRenderer.sendSync('openSettings', {});
 	}
 
 	folderAction () {
@@ -77,6 +97,7 @@ class App extends React.Component {
 						}
 					});
 					db.addSongs(temp);
+					self.childSongList.current.updateSongs();
 				}
 			});
 		} else {
@@ -114,9 +135,9 @@ class App extends React.Component {
 							<MenuBoton class="default" action={() => {this.donwloadAction();}} icon="download"/>
 						</div>
 						{/*<MenuBoton class="default pull-right" action={this.homeAction()} icon="arrows-ccw"*/}
-						           {/*text={'Actualizar'}/>*/}
-						{/*<MenuBoton class="default pull-right" action={this.toggleWindowSize} icon="popup"/>*/}
-						{/*<MenuBoton class="default pull-right" action={this.homeAction()} icon="cog"/>*/}
+						{/*text={'Actualizar'}/>*/}
+						<MenuBoton class="default pull-right" action={this.toggleWindowSize} icon="popup"/>
+						<MenuBoton class="default pull-right" action={this.settingAction} icon="cog"/>
 					</div>
 				</header>,
 				<div key={'main_playlist'} className="window-content" style={{height: '470px'}}>
@@ -129,7 +150,8 @@ class App extends React.Component {
 							<SongList db={db} vex={vex} playlist={this.state.playlist} ref={this.childSongList}
 							          ondblclickSong={this.ondblclickSong}
 							          style={{display: (this.state.window === 'home' ? 'block' : 'none')}}/>
-							<YTdownloader style={{display: (this.state.window === 'download' ? 'block' : 'none')}}/>
+							<YTdownloader db={db} vex={vex} playlist={this.state.playlist}
+							              style={{display: (this.state.window === 'download' ? 'block' : 'none')}}/>
 						</div>
 					</div>
 				</div>,

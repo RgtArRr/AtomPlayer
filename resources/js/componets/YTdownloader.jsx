@@ -40,15 +40,9 @@ export default class YTdownloader extends React.Component {
 				state.downloading = false;
 				self.setState(state);
 				self.inputURL.current.value = '';
-				/*
-				{"videoId":"PvxIjey1waE",
-				"stats":{transferredBytes":9874507,"runtime":23,"averageSpeed":411437.79},
-				"file":"/Users/kennethobregon/Music/Bella Ciao - La Casa de Papel (FrenchItalian  | FrançaiseItalienne Version  by Chloé - COVER ).mp3",
-				"youtubeUrl":"http://www.youtube.com/watch?v=PvxIjey1waE","videoTitle":"Bella Ciao - La Casa de Papel (FrenchItalian  | FrançaiseItalienne Version  by Chloé - COVER )",
-				"artist":"Bella Ciao",
-				"title":"La Casa de Papel (FrenchItalian  | FrançaiseItalienne Version  by Chloé",
-				"thumbnail":null}
-				* */
+				self.props.db.addSongs([
+					{type: 'song', path: data.file, name: data.videoTitle, playlist: self.props.playlist},
+				]);
 			});
 
 			self.YD.on('error', function (error) {
@@ -59,7 +53,6 @@ export default class YTdownloader extends React.Component {
 				let state = self.state;
 				state.percentage = progress.progress.percentage;
 				self.setState(state);
-				console.log(progress);
 			});
 
 			let state = self.state;
@@ -87,17 +80,21 @@ export default class YTdownloader extends React.Component {
 	}
 
 	download () {
-		let state = this.state;
-		let regexRule = /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
-		let YTid = this.inputURL.current.value.match(regexRule);
-		if (YTid !== null) {
-			YTid = YTid[1];
-			if (YTid.length === 11) {
-				this.YD.download(YTid);
-				state.downloading = true;
-				state.percentage = 0;
-				this.setState(state);
+		if (this.props.playlist !== null) {
+			let state = this.state;
+			let regexRule = /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
+			let YTid = this.inputURL.current.value.match(regexRule);
+			if (YTid !== null) {
+				YTid = YTid[1];
+				if (YTid.length === 11) {
+					this.YD.download(YTid);
+					state.downloading = true;
+					state.percentage = 0;
+					this.setState(state);
+				}
 			}
+		} else {
+			this.props.vex.dialog.alert('No se ha seleccionado una playlist');
 		}
 	}
 

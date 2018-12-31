@@ -1,7 +1,7 @@
 module.exports = {
 	entry: {
 		app: './resources/js/app.jsx',
-		// manager: './js/app/manager.jsx',
+		settings: './resources/js/settings.jsx',
 	},
 	output: {
 		path: __dirname + '/',
