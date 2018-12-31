@@ -10,7 +10,7 @@
     "react_build": "webpack -p"
   },
   "dependencies": {
-    "ffmpeg-static-electron": "^2.0.1",
+    "ffbinaries": "^1.1.0",
     "nedb": "^1.8.0",
     "react": "^16.7.0",
     "react-contextmenu": "^2.10.0",

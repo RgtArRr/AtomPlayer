@@ -32,12 +32,13 @@ function MenuBoton (props) {
 class App extends React.Component {
 	constructor (props) {
 		super(props);
-		this.state = {playlist: null};
+		this.state = {playlist: null, window: 'home'};
 
 		this.childSongList = React.createRef();
 		this.childPlayer = React.createRef();
 
 		this.homeAction = this.homeAction.bind(this);
+		this.donwloadAction = this.donwloadAction.bind(this);
 		this.folderAction = this.folderAction.bind(this);
 		this.onChangePlayList = this.onChangePlayList.bind(this);
 		this.ondblclickSong = this.ondblclickSong.bind(this);
@@ -45,7 +46,15 @@ class App extends React.Component {
 	}
 
 	homeAction () {
-		//todo
+		let state = this.state;
+		state.window = 'home';
+		this.setState(state);
+	}
+
+	donwloadAction () {
+		let state = this.state;
+		state.window = 'download';
+		this.setState(state);
 	}
 
 	folderAction () {
@@ -100,14 +109,14 @@ class App extends React.Component {
 					<h1 className="title">AtomPlayer</h1>
 					<div className="toolbar-actions">
 						<div className="btn-group">
-							<MenuBoton class="default" action={this.homeAction.bind(this)} icon="home"/>
-							<MenuBoton class="default" action={() => { this.folderAction();}} icon="folder"/>
-							<MenuBoton class="default" action={this.homeAction()} icon="download"/>
+							<MenuBoton class="default" action={() => {this.homeAction();}} icon="home"/>
+							<MenuBoton class="default" action={() => {this.folderAction();}} icon="folder"/>
+							<MenuBoton class="default" action={() => {this.donwloadAction();}} icon="download"/>
 						</div>
-						<MenuBoton class="default pull-right" action={this.homeAction()} icon="arrows-ccw"
-						           text={'Actualizar'}/>
-						<MenuBoton class="default pull-right" action={this.toggleWindowSize} icon="popup"/>
-						<MenuBoton class="default pull-right" action={this.homeAction()} icon="cog"/>
+						{/*<MenuBoton class="default pull-right" action={this.homeAction()} icon="arrows-ccw"*/}
+						           {/*text={'Actualizar'}/>*/}
+						{/*<MenuBoton class="default pull-right" action={this.toggleWindowSize} icon="popup"/>*/}
+						{/*<MenuBoton class="default pull-right" action={this.homeAction()} icon="cog"/>*/}
 					</div>
 				</header>,
 				<div key={'main_playlist'} className="window-content" style={{height: '470px'}}>
@@ -117,9 +126,10 @@ class App extends React.Component {
 							          onChangePlayList={this.onChangePlayList}/>
 						</div>
 						<div className="pane">
-							{/*<SongList db={db} vex={vex} playlist={this.state.playlist} ref={this.childSongList}*/}
-							          {/*ondblclickSong={this.ondblclickSong}/>*/}
-							<YTdownloader/>
+							<SongList db={db} vex={vex} playlist={this.state.playlist} ref={this.childSongList}
+							          ondblclickSong={this.ondblclickSong}
+							          style={{display: (this.state.window === 'home' ? 'block' : 'none')}}/>
+							<YTdownloader style={{display: (this.state.window === 'download' ? 'block' : 'none')}}/>
 						</div>
 					</div>
 				</div>,

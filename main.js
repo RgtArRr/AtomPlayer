@@ -48,7 +48,7 @@ function createWindow () {
 	//Toogle Basic and full mode
 	ipcMain.on('toogleMode', function (eventRet, arg) {
 		if (win.getSize()[0] === 800 && win.getSize()[1] === 600) {
-			win.setBounds({x: width - 386, y: height - 75, width: 400, height: 75});
+			win.setBounds({x: width - 400, y: height - 75, width: 400, height: 75});
 			win.setAlwaysOnTop(true);
 		} else {
 			win.setBounds({x: Math.round(width / 2 - 400), y: Math.round(height / 2 - 300), width: 800, height: 600});

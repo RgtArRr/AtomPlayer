@@ -72,7 +72,7 @@ export default class SongList extends React.Component {
 	render () {
 		return (
 			[
-				<div key={'div_table'} className="table-wrapper fill">
+				<div key={'div_table'} className="table-wrapper fill" style={this.props.style}>
 					<table>
 						<thead>
 						<tr>

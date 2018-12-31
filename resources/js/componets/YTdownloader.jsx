@@ -1,67 +1,129 @@
 import React from 'react';
 
-var path = require('path');
+const path = require('path');
 const {app} = require('electron').remote;
 const YoutubeMp3Downloader = require('youtube-mp3-downloader');
-const ffmpeg = require('ffmpeg-static-electron');
+const os = require('os');
+const fs = require('fs');
+
+var ffbinaries = require('ffbinaries');
+
+console.log(app.getAppPath());
 
 //https://www.youtube.com/watch?v=WMxdUmgJUfI
 export default class YTdownloader extends React.Component {
 	constructor (props) {
 		super(props);
+		this.state = {ready: false, downloading: false, percentage: 0};
+
+		this.inputURL = React.createRef();
+
 		this.YD = null;
 		this.download = this.download.bind(this);
 	}
 
 	componentDidMount () {
-		console.log(require.resolve('ffmpeg-static-electron'));
-		console.log(path.resolve('node_modules/ffmpeg-static-electron/' + ffmpeg.path));
-		this.YD = new YoutubeMp3Downloader({
-			'ffmpegPath': path.resolve('node_modules/ffmpeg-static-electron/' + ffmpeg.path),
-			'outputPath': app.getPath('music'),
-			'youtubeVideoQuality': 'highest',
-			'queueParallelism': 1,
-			'progressTimeout': 500,
-		});
+		let self = this;
+		let ffmpegPath = app.getAppPath() + '/ffmpeg' + (os.platform() === 'win32' ? '.exe' : '');
+		let setupDownloader = function () {
+			self.YD = new YoutubeMp3Downloader({
+				'ffmpegPath': ffmpegPath,
+				'outputPath': app.getPath('music'),
+				'youtubeVideoQuality': 'highest',
+				'queueParallelism': 1,
+				'progressTimeout': 500,
+			});
 
-		this.YD.on('finished', function (err, data) {
-			console.log(JSON.stringify(data));
-		});
+			self.YD.on('finished', function (err, data) {
+				console.log(JSON.stringify(data));
+				let state = self.state;
+				state.downloading = false;
+				self.setState(state);
+				self.inputURL.current.value = '';
+				/*
+				{"videoId":"PvxIjey1waE",
+				"stats":{transferredBytes":9874507,"runtime":23,"averageSpeed":411437.79},
+				"file":"/Users/kennethobregon/Music/Bella Ciao - La Casa de Papel (FrenchItalian  | FrançaiseItalienne Version  by Chloé - COVER ).mp3",
+				"youtubeUrl":"http://www.youtube.com/watch?v=PvxIjey1waE","videoTitle":"Bella Ciao - La Casa de Papel (FrenchItalian  | FrançaiseItalienne Version  by Chloé - COVER )",
+				"artist":"Bella Ciao",
+				"title":"La Casa de Papel (FrenchItalian  | FrançaiseItalienne Version  by Chloé",
+				"thumbnail":null}
+				* */
+			});
 
-		this.YD.on('error', function (error) {
-			console.log(error);
-		});
+			self.YD.on('error', function (error) {
+				console.log(error);
+			});
 
-		this.YD.on('progress', function (progress) {
-			console.log(JSON.stringify(progress));
-		});
+			self.YD.on('progress', function (progress) {
+				let state = self.state;
+				state.percentage = progress.progress.percentage;
+				self.setState(state);
+				console.log(progress);
+			});
+
+			let state = self.state;
+			state.ready = true;
+			self.setState(state);
+		};
+		console.log(ffmpegPath);
+
+		if (!fs.existsSync(ffmpegPath)) {
+			console.log('download binaries');
+			ffbinaries.downloadBinaries(['ffmpeg'], {
+				platform: os.platform(),
+				quiet: true,
+				destination: app.getAppPath(),
+			}, function () {
+				setupDownloader();
+			});
+		} else {
+			setupDownloader();
+		}
+
 	}
 
 	componentWillUnmount () {
 	}
 
 	download () {
-		this.YD.download('WMxdUmgJUfI');
+		let state = this.state;
+		let regexRule = /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
+		let YTid = this.inputURL.current.value.match(regexRule);
+		if (YTid !== null) {
+			YTid = YTid[1];
+			if (YTid.length === 11) {
+				this.YD.download(YTid);
+				state.downloading = true;
+				state.percentage = 0;
+				this.setState(state);
+			}
+		}
 	}
 
 	render () {
 		return (
-
-			<div className="ytdownloadercontainer">
-				<div className="form-group"><label>Descargar musica en .mp3 de YouTube</label>
-					<input type="text" className="form-control" placeholder="Copie un link de youtube aqui"/>
-				</div>
-				<button className="btn btn-form btn-primary" onClick={this.download}>Descargar</button>
-				<div className="progress">
-					<div className="c100"><span></span>
-						<div className="slice">
-							<div className="bar"></div>
-							<div className="fill"></div>
+			this.state.ready ?
+				<div className="ytdownloadercontainer" style={this.props.style}>
+					<div className="form-group"><label>Descargar musica en .mp3 de YouTube</label>
+						<input type="text" className="form-control" placeholder="Copie un enlace de youtube aqui"
+						       ref={this.inputURL}/>
+					</div>
+					<button className="btn btn-form btn-primary" onClick={this.download}
+					        style={{display: this.state.downloading ? 'none' : 'block'}}>Descargar
+					</button>
+					<div className="progress" style={{display: this.state.downloading ? 'block' : 'none'}}>
+						<div className={'c100 p' + Math.round(this.state.percentage)}>
+							<span>{Math.round(this.state.percentage)}</span>
+							<div className="slice">
+								<div className="bar"></div>
+								<div className="fill"></div>
+							</div>
+							<div className="back"></div>
 						</div>
-						<div className="back"></div>
 					</div>
 				</div>
-			</div>
+				: <span style={this.props.style}>Preparando para ejecutar esta accion</span>
 		);
 	}
 }
