@@ -38,3 +38,11 @@ jspm_packages
 
 \.idea/
 resources/db/data\.store
+
+resources/js/settings\.min\.js
+
+resources/js/app\.min\.js
+
+ffmpeg
+
+\.DS_Store
