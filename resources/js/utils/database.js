@@ -20,6 +20,33 @@ module.exports = function () {
 
 		});
 	};
+	/*
+	[{
+	 type: 'config'
+	 identifier:
+	 value:
+	}]
+	*/
+
+	this.getConfig = function (responseCallback) {
+		self.db.find({type: 'config'}).sort({createdAt: 1}).exec(function (err, docs) {
+			responseCallback(docs);
+		});
+	};
+
+	this.changeConfig = function (identifier, value, successCallback) {
+		self.db.findOne({type: 'config', identifier: identifier}, function (err, doc) {
+			if (doc !== null) {
+				self.db.update({_id: doc._id}, {$set: {value: value}}, {}, function () {
+					successCallback();
+				});
+			} else {
+				self.db.insert({type: 'config', identifier: identifier, value: value}, function () {
+					successCallback();
+				});
+			}
+		});
+	};
 
 	/*
 	[{
@@ -35,7 +62,7 @@ module.exports = function () {
 	};
 
 	this.addPlayList = function (name, successCallback) {
-		this.db.insert({type: 'playlist', name: name}, function () {
+		self.db.insert({type: 'playlist', name: name}, function () {
 			successCallback();
 		});
 	};
