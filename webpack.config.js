@@ -1,3 +1,5 @@
+const webpack = require('webpack');
+
 module.exports = {
 	entry: {
 		app: './resources/js/app.jsx',
@@ -24,4 +26,9 @@ module.exports = {
 		],
 	},
 	target: 'electron-renderer',
+	plugins: [
+		new webpack.DefinePlugin({
+			'process.env.FLUENTFFMPEG_COV': false,
+		}),
+	],
 };
