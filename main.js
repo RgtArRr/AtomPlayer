@@ -25,11 +25,11 @@ function createWindow () {
 	win.loadURL(`file://${__dirname}/index.html`);
 
 	// Open the DevTools.
-	win.webContents.openDevTools();
+	// win.webContents.openDevTools();
 
 	//https://electronjs.org/docs/tutorial/devtools-extension
-	BrowserWindow.addDevToolsExtension(
-		'/home/desarrollo03/.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.4.3_0');
+	// BrowserWindow.addDevToolsExtension(
+	// 	'/home/desarrollo03/.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.4.3_0');
 
 	// Emitted when the window is closed.
 	win.on('closed', () => {
@@ -76,7 +76,7 @@ function createWindow () {
 		});
 		settingsWindow.loadURL(`file://${__dirname}/settings.html`);
 		settingsWindow.show();
-		settingsWindow.webContents.openDevTools();
+		// settingsWindow.webContents.openDevTools();
 		settingsWindow.on('closed', function () {
 			settingsWindow = null;
 		});

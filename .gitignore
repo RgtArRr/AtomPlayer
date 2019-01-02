@@ -46,3 +46,5 @@ resources/js/app\.min\.js
 ffmpeg
 
 \.DS_Store
+
+build/
