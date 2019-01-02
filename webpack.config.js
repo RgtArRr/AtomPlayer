@@ -9,21 +9,17 @@ module.exports = {
 		path: __dirname + '/',
 		filename: './resources/js/[name].min.js',
 	},
-	resolve: {
-		extensions: ['.js', '.jsx'],
-	},
 	module: {
-		loaders: [
+		rules: [
 			{
-				test: /\.jsx?$/,
-				loader: 'babel-loader',
+				test: /\.(js|jsx)$/,
 				exclude: /node_modules/,
-				query: {
-					cacheDirectory: true,
-					presets: ['react', 'es2015'],
-				},
+				use: ['babel-loader'],
 			},
 		],
+	},
+	resolve: {
+		extensions: ['*', '.js', '.jsx'],
 	},
 	target: 'electron-renderer',
 	plugins: [
