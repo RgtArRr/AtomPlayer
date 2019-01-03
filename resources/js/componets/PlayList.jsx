@@ -87,7 +87,7 @@ export default class PlayList extends React.Component {
 		return (
 			[
 				<nav key={'nav_playlist'} className="nav-group">
-					<h5 className="nav-group-title">PlayLists</h5>
+					<h5 className="nav-group-title">Playlists</h5>
 					<button style={button_add_style} className="btn btn-default"
 					        onClick={() => {this.handleClick(this, {action: 'add'});}}>
 						<span className="icon icon-plus"></span>
