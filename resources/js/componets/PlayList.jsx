@@ -36,8 +36,8 @@ export default class PlayList extends React.Component {
 
 		if (data.action === 'add') {
 			self.props.vex.dialog.prompt({
-				message: 'Nombre de playlist',
-				placeholder: 'Es requerido',
+				message: this.props.strings.name_playlist,
+				placeholder: this.props.strings.id_required,
 				callback: function (value) {
 					if (value !== false) {
 						self.props.db.addPlayList(value, function () {
@@ -49,8 +49,8 @@ export default class PlayList extends React.Component {
 		}
 		if (data.action === 'edit') {
 			self.props.vex.dialog.prompt({
-				message: 'Nombre de playlist',
-				placeholder: 'Es requerido',
+				message: this.props.strings.name_playlist,
+				placeholder: this.props.strings.id_required,
 				value: data.data.name,
 				callback: function (value) {
 					if (value !== false) {
@@ -63,8 +63,7 @@ export default class PlayList extends React.Component {
 		}
 		if (data.action === 'delete') {
 			self.props.vex.dialog.confirm({
-				message: 'Desea eliminar '
-					+ data.data.name + ', ademas del listado de canciones que contiene?',
+				message: this.props.strings.formatString(this.props.strings.confirm_playlist_delete, data.data.name),
 				callback: function (value) {
 					if (value) {
 						self.props.db.deletePlayList(data.data._id, function () {
@@ -104,10 +103,10 @@ export default class PlayList extends React.Component {
 				</nav>,
 				<ContextMenu key={'contexmenu_playlist'} id="contexmenu_playlist">
 					<MenuItem onClick={this.handleClick} data={{action: 'edit'}}>
-						Renombrar
+						{this.props.strings.rename}
 					</MenuItem>
 					<MenuItem onClick={this.handleClick} data={{action: 'delete'}}>
-						Eliminar
+						{this.props.strings.delete}
 					</MenuItem>
 				</ContextMenu>,
 			]

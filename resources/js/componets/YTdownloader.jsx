@@ -94,7 +94,7 @@ export default class YTdownloader extends React.Component {
 				}
 			}
 		} else {
-			this.props.vex.dialog.alert('No se ha seleccionado una playlist');
+			this.props.vex.dialog.alert(this.props.strings.select_playlist);
 		}
 	}
 
@@ -102,12 +102,14 @@ export default class YTdownloader extends React.Component {
 		return (
 			this.state.ready ?
 				<div className="ytdownloadercontainer" style={this.props.style}>
-					<div className="form-group"><label>Descargar musica en .mp3 de YouTube</label>
-						<input type="text" className="form-control" placeholder="Copie un enlace de youtube aqui"
+					<div className="form-group">
+						<label>{this.props.strings.ytdownload_explain}</label>
+						<input type="text" className="form-control" placeholder={this.props.ytdownload_instructions}
 						       ref={this.inputURL}/>
 					</div>
 					<button className="btn btn-form btn-primary" onClick={this.download}
-					        style={{display: this.state.downloading ? 'none' : 'block'}}>Descargar
+					        style={{display: this.state.downloading ? 'none' : 'block'}}>
+						{this.props.strings.download}
 					</button>
 					<div className="progress" style={{display: this.state.downloading ? 'block' : 'none'}}>
 						<div className={'c100 p' + Math.round(this.state.percentage)}>
@@ -120,7 +122,7 @@ export default class YTdownloader extends React.Component {
 						</div>
 					</div>
 				</div>
-				: <span style={this.props.style}>Preparando para ejecutar esta accion</span>
+				: <span style={this.props.style}>{this.props.strings.ytdownload_loading}</span>
 		);
 	}
 }

@@ -4,6 +4,7 @@ import { render } from 'react-dom';
 const ipcRenderer = require('electron').ipcRenderer;
 const {getKey} = require('./utils/keycode');
 const Database = require('./utils/database');
+const {strings} = require('./utils/locale');
 
 const db = new Database();
 
@@ -90,28 +91,28 @@ class Settings extends React.Component {
 		return (
 			<div className="window">
 				<header className="toolbar toolbar-header">
-					<h1 className="title">Opciones</h1>
+					<h1 className="title">{strings.settings_title}</h1>
 				</header>
 
 				<div className="window-content">
-					<h4>Botones/Shortcuts <span className="icon icon-keyboard"></span></h4>
+					<h4>{strings.settings_section_1} <span className="icon icon-keyboard"></span></h4>
 					<div className="shortcutDiv">
-						<span className="keyboard">F11</span>: Minimizar/Maximizar Reproductor
+						<span className="keyboard">F11</span>: {strings.min_max_player}
 					</div>
 					<div className="shortcutDiv">
 						<span className="keyboard" onClick={() => {this.changeShortCut('medianexttrack');}}>
 							{(this.state.medianexttrack === null) ? 'ELEGIR' : this.state.medianexttrack}
-						</span>: Siguiente cancion
+						</span>: {strings.next_song}
 					</div>
 					<div className="shortcutDiv">
 						<span className="keyboard" onClick={() => {this.changeShortCut('mediaprevioustrack');}}>
 							{(this.state.mediaprevioustrack === null) ? 'ELEGIR' : this.state.mediaprevioustrack}
-						</span>: Anterior cancion
+						</span>: {strings.prev_song}
 					</div>
 					<div className="shortcutDiv">
 						<span className="keyboard" onClick={() => {this.changeShortCut('mediaplaypause');}}>
 							{(this.state.mediaplaypause === null) ? 'ELEGIR' : this.state.mediaplaypause}
-						</span>: Reproducir o Pausar la cancion
+						</span>: {strings.plat_song}
 					</div>
 
 					{/*<div className="shortcutDiv">*/}
@@ -119,15 +120,14 @@ class Settings extends React.Component {
 					{/*</div>*/}
 
 					<div style={{display: this.state.pickKey ? 'block' : 'none'}}>
-						<b>Presiona una tecla o combinacion de teclas para asignar.</b>
-
+						<b>{strings.settings_instructions_key}</b>
 					</div>
 					<div style={{display: this.state.requireRestart ? 'block' : 'none', color: 'red'}}>
-						Es necesario reiniciar la aplicacion.
+						{strings.restart_required}
 					</div>
 					{/*<div id="temp">Solo temporalmente.</div>*/}
 
-					<button className="btn btn-default" onClick={() => {window.close();}}>Cerrar</button>
+					<button className="btn btn-default" onClick={() => {window.close();}}>{strings.close_window}</button>
 				</div>
 				<footer className="toolbar toolbar-footer">
 					<h1 className="title">Version: </h1>
