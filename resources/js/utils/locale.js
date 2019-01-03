@@ -23,6 +23,7 @@ let strings = new LocalizedStrings({
 		table_duration: 'Length',
 		settings_title: 'Settings',
 		settings_section_1: 'Shortcuts',
+		settings_section_2: 'Miscellaneous',
 		min_max_player: 'Minimize / Maximize Player',
 		next_song: 'Next song',
 		prev_song: 'Previous Song',
@@ -30,7 +31,7 @@ let strings = new LocalizedStrings({
 		settings_instructions_key: 'Press a key or combination of key to asing.',
 		restart_required: 'Restart the application',
 		close_window: 'Close',
-
+		download_folder: 'Download folder',
 	},
 	es: {
 		choose_song: 'Escoge una musica',
@@ -51,6 +52,7 @@ let strings = new LocalizedStrings({
 		table_duration: 'Duración',
 		settings_title: 'Opciones',
 		settings_section_1: 'Atajos de teclado',
+		settings_section_2: 'Ajustes',
 		min_max_player: 'Minimizar / Maximizar Reproductor',
 		next_song: 'Siguiente cancion',
 		prev_song: 'Anterior cancion',
@@ -58,6 +60,7 @@ let strings = new LocalizedStrings({
 		settings_instructions_key: 'Presiona una tecla o combinacion de teclas para asignar.',
 		restart_required: 'Es necesario reiniciar la aplicacion.',
 		close_window: 'Cerrar',
+		download_folder: 'Carpeta de descargas',
 	},
 });
 

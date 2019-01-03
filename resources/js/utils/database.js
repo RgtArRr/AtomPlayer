@@ -13,9 +13,15 @@ module.exports = function () {
 				if (docs.length === 0) {
 					self.db.insert({type: 'playlist', name: 'Default'});
 				}
-				if (readyCallback) {
-					readyCallback();
-				}
+				let folder = app.getPath('music');
+				self.db.find({type: 'config', identifier: 'folder'}, function (err, docs) {
+					if (docs.length === 0) {
+						self.db.insert({type: 'playlist', identifier: 'folder', folder});
+						if (readyCallback) {
+							readyCallback();
+						}
+					}
+				});
 			});
 
 		});

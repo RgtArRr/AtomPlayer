@@ -7,6 +7,7 @@ import Player from './componets/Player';
 import YTdownloader from './componets/YTdownloader';
 
 const {dialog} = require('electron').remote;
+const {app} = require('electron').remote;
 const {clipboard} = require('electron');
 const ipcRenderer = require('electron').ipcRenderer;
 const Database = require('./utils/database');
@@ -17,6 +18,7 @@ vex.registerPlugin(require('vex-dialog'));
 vex.defaultOptions.className = 'vex-theme-os';
 
 const db = new Database();
+let config = null;
 
 function MenuBoton (props) {
 	return (
@@ -30,7 +32,7 @@ class App extends React.Component {
 	constructor (props) {
 		super(props);
 		this.state = {playlist: null, window: 'home'};
-
+		this.config = null;
 		this.childSongList = React.createRef();
 		this.childPlayer = React.createRef();
 
@@ -149,7 +151,9 @@ class App extends React.Component {
 							          ondblclickSong={this.ondblclickSong}
 							          style={{display: (this.state.window === 'home' ? 'block' : 'none')}}/>
 							<YTdownloader db={db} vex={vex} playlist={this.state.playlist} strings={strings}
-							              style={{display: (this.state.window === 'download' ? 'block' : 'none')}}/>
+							              style={{display: (this.state.window === 'download' ? 'block' : 'none')}}
+							              folder_download={config.find(o => o.identifier === 'folder')}
+							              folder_ffmpeg={app.getAppPath()}/>
 						</div>
 					</div>
 				</div>,
@@ -170,9 +174,12 @@ class App extends React.Component {
 }
 
 db.init(function () {
-	render((<App></App>),
-		document.getElementById('root'),
-	);
+	db.getConfig(function (data) {
+		config = data;
+		render((<App></App>),
+			document.getElementById('root'),
+		);
+	});
 });
 
 //#########################OLD CODE. WILL BE REMOVE SOON

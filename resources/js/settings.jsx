@@ -2,6 +2,8 @@ import React from 'react';
 import { render } from 'react-dom';
 
 const ipcRenderer = require('electron').ipcRenderer;
+const {app} = require('electron').remote;
+const {dialog} = require('electron').remote;
 const {getKey} = require('./utils/keycode');
 const Database = require('./utils/database');
 const {strings} = require('./utils/locale');
@@ -17,6 +19,7 @@ class Settings extends React.Component {
 		this.state = {
 			pickKey: false,
 			requireRestart: false,
+			folder: null,
 			medianexttrack: null,
 			mediaplaypause: null,
 			mediaprevioustrack: null,
@@ -25,6 +28,7 @@ class Settings extends React.Component {
 		this.newKeyDown = this.newKeyDown.bind(this);
 		this.getNextKey = this.getNextKey.bind(this);
 		this.changeShortCut = this.changeShortCut.bind(this);
+		this.changeDownloadFolder = this.changeDownloadFolder.bind(this);
 	}
 
 	componentDidMount () {
@@ -55,6 +59,8 @@ class Settings extends React.Component {
 			state.mediaplaypause = temp ? temp.value : null;
 			temp = docs.find(o => o.identifier === 'mediaprevioustrack');
 			state.mediaprevioustrack = temp ? temp.value : null;
+			temp = docs.find(o => o.identifier === 'folder');
+			state.folder = temp ? temp.value : null;
 			self.setState(state);
 		});
 	}
@@ -87,6 +93,19 @@ class Settings extends React.Component {
 		self.setState(state);
 	}
 
+	changeDownloadFolder () {
+		let folder = dialog.showOpenDialog({properties: ['openDirectory']});
+		if (folder) {
+			let self = this;
+			let state = self.state;
+			db.changeConfig('folder', folder, function () {
+				state.folder = folder;
+				state.requireRestart = true;
+				self.setState(state);
+			});
+		}
+	}
+
 	render () {
 		return (
 			<div className="window">
@@ -112,7 +131,14 @@ class Settings extends React.Component {
 					<div className="shortcutDiv">
 						<span className="keyboard" onClick={() => {this.changeShortCut('mediaplaypause');}}>
 							{(this.state.mediaplaypause === null) ? 'ELEGIR' : this.state.mediaplaypause}
-						</span>: {strings.plat_song}
+						</span>: {strings.play_song}
+					</div>
+
+					<h4>{strings.settings_section_2} <span className="icon icon-cog"></span></h4>
+					<div className="shortcutDiv">
+						<span className="keyboard" onClick={this.changeDownloadFolder} style={{width: '300px'}}>
+							{(this.state.folder === null) ? app.getPath('music') : this.state.folder}
+						</span>: {strings.download_folder}
 					</div>
 
 					{/*<div className="shortcutDiv">*/}
@@ -127,7 +153,8 @@ class Settings extends React.Component {
 					</div>
 					{/*<div id="temp">Solo temporalmente.</div>*/}
 
-					<button className="btn btn-default" onClick={() => {window.close();}}>{strings.close_window}</button>
+					<button className="btn btn-default"
+					        onClick={() => {window.close();}}>{strings.close_window}</button>
 				</div>
 				<footer className="toolbar toolbar-footer">
 					<h1 className="title">Version: </h1>

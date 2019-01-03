@@ -80,8 +80,8 @@ export default class SongList extends React.Component {
 					<table>
 						<thead>
 						<tr>
-							<th width="80%">{self.props.strings.confirm_song_delete}</th>
-							<th width="20%">{self.props.strings.confirm_song_delete}</th>
+							<th width="80%">{this.props.strings.table_name}</th>
+							<th width="20%">{this.props.strings.table_duration}</th>
 						</tr>
 						</thead>
 					</table>
