@@ -1,8 +1,8 @@
 const Datastore = require('nedb');
 const {app} = require('electron').remote;
 
-function modulo(_id, bounds) {
-	return (_id % bounds + bounds) % bounds;
+function modulo(index, bounds) {
+	return (index % bounds + bounds) % bounds;
 }
 
 module.exports = function () {
