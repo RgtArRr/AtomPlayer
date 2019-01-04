@@ -126,10 +126,10 @@ module.exports = function () {
 					let index = songs.findIndex(k => k._id === _id);
 					let target;
 					if (type === 'next') {
-						target = index + 1;
+						target = this.__modulo(index + 1, songs.length);
 					}
 					if (type === 'prev') {
-						target = index - 1;
+						target = this.__modulo(index - 1, songs.length);
 					}
 					if (type === 'rand') {
 						target = Math.floor(Math.random() * songs.length);
@@ -141,6 +141,10 @@ module.exports = function () {
 			}
 		});
 	};
+
+	this.__modulo = function(_id, bounds) {
+		return (_id % bounds + bounds) % bounds;
+	}
 
 	this.getNextSong = function (_id, successCallback) {
 		this.__getSongs(_id, 'next', successCallback);
