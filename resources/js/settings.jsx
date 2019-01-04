@@ -50,17 +50,16 @@ class Settings extends React.Component {
 			}
 		});
 		db.getConfig(function (docs) {
-			console.log(docs);
 			let state = self.state;
 			let temp;
 			temp = docs.find(o => o.identifier === 'medianexttrack');
-			state.medianexttrack = temp ? temp.value : null;
+			state.medianexttrack = temp ? temp.value[0] : null;
 			temp = docs.find(o => o.identifier === 'mediaplaypause');
-			state.mediaplaypause = temp ? temp.value : null;
+			state.mediaplaypause = temp ? temp.value[0] : null;
 			temp = docs.find(o => o.identifier === 'mediaprevioustrack');
-			state.mediaprevioustrack = temp ? temp.value : null;
+			state.mediaprevioustrack = temp ? temp.value[0] : null;
 			temp = docs.find(o => o.identifier === 'folder');
-			state.folder = temp ? temp.value : null;
+			state.folder = temp ? temp.value[0] : null;
 			self.setState(state);
 		});
 	}

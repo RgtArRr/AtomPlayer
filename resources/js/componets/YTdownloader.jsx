@@ -101,7 +101,8 @@ export default class YTdownloader extends React.Component {
 				<div className="ytdownloadercontainer" style={this.props.style}>
 					<div className="form-group">
 						<label>{this.props.strings.ytdownload_explain}</label>
-						<input type="text" className="form-control" placeholder={this.props.strings.ytdownload_instructions}
+						<input type="text" className="form-control"
+						       placeholder={this.props.strings.ytdownload_instructions}
 						       ref={this.inputURL}/>
 					</div>
 					<button className="btn btn-form btn-primary" onClick={this.download}
