@@ -38,6 +38,9 @@ export default class Player extends React.Component {
 			let state = self.state;
 			state.totalTime = Math.round(e.target.duration);
 			self.setState(state);
+			self.props.db.updateDuratioSong(self.state._id, state.totalTime, function () {
+				self.props.songlist.current.updateSongs();
+			});
 		});
 
 		this.audioPlayer.current.addEventListener('timeupdate', function (e) {

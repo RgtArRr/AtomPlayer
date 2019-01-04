@@ -1,14 +1,11 @@
 import React from 'react';
 
 const path = require('path');
-const {app} = require('electron').remote;
 const YoutubeMp3Downloader = require('youtube-mp3-downloader');
 const os = require('os');
 const fs = require('fs');
 
 var ffbinaries = require('ffbinaries');
-
-console.log(app.getAppPath());
 
 //https://www.youtube.com/watch?v=WMxdUmgJUfI
 export default class YTdownloader extends React.Component {
@@ -24,11 +21,11 @@ export default class YTdownloader extends React.Component {
 
 	componentDidMount () {
 		let self = this;
-		let ffmpegPath = app.getAppPath() + '/ffmpeg' + (os.platform() === 'win32' ? '.exe' : '');
+		let ffmpegPath = self.props.folder_ffmpeg + '/ffmpeg' + (os.platform() === 'win32' ? '.exe' : '');
 		let setupDownloader = function () {
 			self.YD = new YoutubeMp3Downloader({
 				'ffmpegPath': ffmpegPath,
-				'outputPath': app.getPath('music'),
+				'outputPath': self.props.folder_download,
 				'youtubeVideoQuality': 'highest',
 				'queueParallelism': 1,
 				'progressTimeout': 500,
@@ -66,7 +63,7 @@ export default class YTdownloader extends React.Component {
 			ffbinaries.downloadBinaries(['ffmpeg'], {
 				platform: os.platform(),
 				quiet: true,
-				destination: app.getAppPath(),
+				destination: self.props.folder_ffmpeg,
 			}, function () {
 				setupDownloader();
 			});
@@ -94,7 +91,7 @@ export default class YTdownloader extends React.Component {
 				}
 			}
 		} else {
-			this.props.vex.dialog.alert('No se ha seleccionado una playlist');
+			this.props.vex.dialog.alert(this.props.strings.select_playlist);
 		}
 	}
 
@@ -102,12 +99,14 @@ export default class YTdownloader extends React.Component {
 		return (
 			this.state.ready ?
 				<div className="ytdownloadercontainer" style={this.props.style}>
-					<div className="form-group"><label>Descargar musica en .mp3 de YouTube</label>
-						<input type="text" className="form-control" placeholder="Copie un enlace de youtube aqui"
+					<div className="form-group">
+						<label>{this.props.strings.ytdownload_explain}</label>
+						<input type="text" className="form-control" placeholder={this.props.strings.ytdownload_instructions}
 						       ref={this.inputURL}/>
 					</div>
 					<button className="btn btn-form btn-primary" onClick={this.download}
-					        style={{display: this.state.downloading ? 'none' : 'block'}}>Descargar
+					        style={{display: this.state.downloading ? 'none' : 'block'}}>
+						{this.props.strings.download}
 					</button>
 					<div className="progress" style={{display: this.state.downloading ? 'block' : 'none'}}>
 						<div className={'c100 p' + Math.round(this.state.percentage)}>
@@ -120,7 +119,7 @@ export default class YTdownloader extends React.Component {
 						</div>
 					</div>
 				</div>
-				: <span style={this.props.style}>Preparando para ejecutar esta accion</span>
+				: <span style={this.props.style}>{this.props.strings.ytdownload_loading}</span>
 		);
 	}
 }

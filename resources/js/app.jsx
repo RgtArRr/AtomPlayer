@@ -1,25 +1,24 @@
 console.log(process.versions.electron);
 import React from 'react';
-
 import { render } from 'react-dom';
-
-const http = require('http');
-const fs = require('fs');
-const {dialog} = require('electron').remote;
-const {clipboard} = require('electron');
-const ipcRenderer = require('electron').ipcRenderer;
-const Database = require('./utils/database');
-const {wk, rk} = require('./utils/WeakKey');
-const vex = require('vex-js');
-vex.registerPlugin(require('vex-dialog'));
-vex.defaultOptions.className = 'vex-theme-os';
-
 import SongList from './componets/SongList';
 import PlayList from './componets/PlayList';
 import Player from './componets/Player';
 import YTdownloader from './componets/YTdownloader';
 
+const {dialog} = require('electron').remote;
+const {app} = require('electron').remote;
+const {clipboard} = require('electron');
+const ipcRenderer = require('electron').ipcRenderer;
+const Database = require('./utils/database');
+const {strings} = require('./utils/locale');
+const vex = require('vex-js');
+
+vex.registerPlugin(require('vex-dialog'));
+vex.defaultOptions.className = 'vex-theme-os';
+
 const db = new Database();
+let config = null;
 
 function MenuBoton (props) {
 	return (
@@ -33,7 +32,7 @@ class App extends React.Component {
 	constructor (props) {
 		super(props);
 		this.state = {playlist: null, window: 'home'};
-
+		this.config = null;
 		this.childSongList = React.createRef();
 		this.childPlayer = React.createRef();
 
@@ -81,9 +80,9 @@ class App extends React.Component {
 		let self = this;
 		if (self.state.playlist !== null) {
 			dialog.showOpenDialog({
-				title: 'Escoge una musica',
+				title: strings.choose_song,
 				properties: ['openFile', 'multiSelections'],
-				filters: [{name: 'Canciones', extensions: ['mp3']}],
+				filters: [{name: strings.song, extensions: ['mp3']}],
 			}, function (e) {
 				if (e) {
 					let temp = [];
@@ -101,7 +100,7 @@ class App extends React.Component {
 				}
 			});
 		} else {
-			vex.dialog.alert('Seleccione una playlist');
+			vex.dialog.alert(strings.select_playlist);
 		}
 	}
 
@@ -143,23 +142,26 @@ class App extends React.Component {
 				<div key={'main_playlist'} className="window-content" style={{height: '470px'}}>
 					<div className="pane-group">
 						<div className="pane pane-sm sidebar">
-							<PlayList db={db} vex={vex} playlist={this.state.playlist}
+							<PlayList db={db} vex={vex} playlist={this.state.playlist} strings={strings}
 							          onChangePlayList={this.onChangePlayList}/>
 						</div>
 						<div className="pane">
 							<SongList db={db} vex={vex} playlist={this.state.playlist} ref={this.childSongList}
+							          strings={strings}
 							          ondblclickSong={this.ondblclickSong}
 							          style={{display: (this.state.window === 'home' ? 'block' : 'none')}}/>
-							<YTdownloader db={db} vex={vex} playlist={this.state.playlist}
-							              style={{display: (this.state.window === 'download' ? 'block' : 'none')}}/>
+							<YTdownloader db={db} vex={vex} playlist={this.state.playlist} strings={strings}
+							              style={{display: (this.state.window === 'download' ? 'block' : 'none')}}
+							              folder_download={config.find(o => o.identifier === 'folder')}
+							              folder_ffmpeg={app.getAppPath()}/>
 						</div>
 					</div>
 				</div>,
 				<footer key={'main_footer'} className="toolbar toolbar-footer"
 				        style={{minHeight: '75px', WebkitAppRegion: 'no-drag'}}>
-					<button className="btn" id="toggleLyrics">
-						<span className="icon icon-note-beamed"></span>&nbsp;Letras
-					</button>
+					{/*<button className="btn" id="toggleLyrics">*/}
+					{/*<span className="icon icon-note-beamed"></span>&nbsp;Letras*/}
+					{/*</button>*/}
 					<div className="toolbar-actions player">
 						<Player db={db} ref={this.childPlayer} toggleWindowSize={this.toggleWindowSize}
 						        songlist={this.childSongList}/>
@@ -172,9 +174,12 @@ class App extends React.Component {
 }
 
 db.init(function () {
-	render((<App></App>),
-		document.getElementById('root'),
-	);
+	db.getConfig(function (data) {
+		config = data;
+		render((<App></App>),
+			document.getElementById('root'),
+		);
+	});
 });
 
 //#########################OLD CODE. WILL BE REMOVE SOON

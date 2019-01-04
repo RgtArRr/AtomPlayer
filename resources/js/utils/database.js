@@ -3,8 +3,8 @@ const {app} = require('electron').remote;
 
 module.exports = function () {
 	const self = this;
-	var fileDB = app.getAppPath() + '/resources/db/data.store';
 	this.db;
+	let fileDB = app.getAppPath() + '/resources/db/data.store';
 
 	this.init = function (readyCallback) {
 		self.db = new Datastore({filename: fileDB, timestampData: true});
@@ -13,9 +13,15 @@ module.exports = function () {
 				if (docs.length === 0) {
 					self.db.insert({type: 'playlist', name: 'Default'});
 				}
-				if (readyCallback) {
-					readyCallback();
-				}
+				let folder = app.getPath('music');
+				self.db.find({type: 'config', identifier: 'folder'}, function (err, docs) {
+					if (docs.length === 0) {
+						self.db.insert({type: 'playlist', identifier: 'folder', folder});
+					}
+					if (readyCallback) {
+						readyCallback();
+					}
+				});
 			});
 
 		});
@@ -158,11 +164,10 @@ module.exports = function () {
 		this.__getSongs(_id, 'rand', successCallback);
 	};
 
-	this.updateDuratioSong = function (id_song, duration) {
-		// var row = this.readDB('SELECT * FROM cancion WHERE id_cancion = \'' + id_song + '\'');
-		// if (row[0].values[0][3] == 0) {
-		// 	this.writeDB('UPDATE cancion SET duracion = ? WHERE id_cancion = ?', [duration, id_song]);
-		// }
+	this.updateDuratioSong = function (_id, duration, successCallback) {
+		self.db.update({_id: _id}, {$set: {duration: duration}}, {}, function () {
+			successCallback();
+		});
 	};
 
 	this.setConfig = function (key, value) {

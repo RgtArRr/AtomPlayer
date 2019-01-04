@@ -2,8 +2,11 @@ import React from 'react';
 import { render } from 'react-dom';
 
 const ipcRenderer = require('electron').ipcRenderer;
+const {app} = require('electron').remote;
+const {dialog} = require('electron').remote;
 const {getKey} = require('./utils/keycode');
 const Database = require('./utils/database');
+const {strings} = require('./utils/locale');
 
 const db = new Database();
 
@@ -16,6 +19,7 @@ class Settings extends React.Component {
 		this.state = {
 			pickKey: false,
 			requireRestart: false,
+			folder: null,
 			medianexttrack: null,
 			mediaplaypause: null,
 			mediaprevioustrack: null,
@@ -24,6 +28,7 @@ class Settings extends React.Component {
 		this.newKeyDown = this.newKeyDown.bind(this);
 		this.getNextKey = this.getNextKey.bind(this);
 		this.changeShortCut = this.changeShortCut.bind(this);
+		this.changeDownloadFolder = this.changeDownloadFolder.bind(this);
 	}
 
 	componentDidMount () {
@@ -54,6 +59,8 @@ class Settings extends React.Component {
 			state.mediaplaypause = temp ? temp.value : null;
 			temp = docs.find(o => o.identifier === 'mediaprevioustrack');
 			state.mediaprevioustrack = temp ? temp.value : null;
+			temp = docs.find(o => o.identifier === 'folder');
+			state.folder = temp ? temp.value : null;
 			self.setState(state);
 		});
 	}
@@ -86,32 +93,52 @@ class Settings extends React.Component {
 		self.setState(state);
 	}
 
+	changeDownloadFolder () {
+		let folder = dialog.showOpenDialog({properties: ['openDirectory']});
+		if (folder) {
+			let self = this;
+			let state = self.state;
+			db.changeConfig('folder', folder, function () {
+				state.folder = folder;
+				state.requireRestart = true;
+				self.setState(state);
+			});
+		}
+	}
+
 	render () {
 		return (
 			<div className="window">
 				<header className="toolbar toolbar-header">
-					<h1 className="title">Opciones</h1>
+					<h1 className="title">{strings.settings_title}</h1>
 				</header>
 
 				<div className="window-content">
-					<h4>Botones/Shortcuts <span className="icon icon-keyboard"></span></h4>
+					<h4>{strings.settings_section_1} <span className="icon icon-keyboard"></span></h4>
 					<div className="shortcutDiv">
-						<span className="keyboard">F11</span>: Minimizar/Maximizar Reproductor
+						<span className="keyboard">F11</span>: {strings.min_max_player}
 					</div>
 					<div className="shortcutDiv">
 						<span className="keyboard" onClick={() => {this.changeShortCut('medianexttrack');}}>
 							{(this.state.medianexttrack === null) ? 'ELEGIR' : this.state.medianexttrack}
-						</span>: Siguiente cancion
+						</span>: {strings.next_song}
 					</div>
 					<div className="shortcutDiv">
 						<span className="keyboard" onClick={() => {this.changeShortCut('mediaprevioustrack');}}>
 							{(this.state.mediaprevioustrack === null) ? 'ELEGIR' : this.state.mediaprevioustrack}
-						</span>: Anterior cancion
+						</span>: {strings.prev_song}
 					</div>
 					<div className="shortcutDiv">
 						<span className="keyboard" onClick={() => {this.changeShortCut('mediaplaypause');}}>
 							{(this.state.mediaplaypause === null) ? 'ELEGIR' : this.state.mediaplaypause}
-						</span>: Reproducir o Pausar la cancion
+						</span>: {strings.play_song}
+					</div>
+
+					<h4>{strings.settings_section_2} <span className="icon icon-cog"></span></h4>
+					<div className="shortcutDiv">
+						<span className="keyboard" onClick={this.changeDownloadFolder} style={{width: '300px'}}>
+							{(this.state.folder === null) ? app.getPath('music') : this.state.folder}
+						</span>: {strings.download_folder}
 					</div>
 
 					{/*<div className="shortcutDiv">*/}
@@ -119,15 +146,15 @@ class Settings extends React.Component {
 					{/*</div>*/}
 
 					<div style={{display: this.state.pickKey ? 'block' : 'none'}}>
-						<b>Presiona una tecla o combinacion de teclas para asignar.</b>
-
+						<b>{strings.settings_instructions_key}</b>
 					</div>
 					<div style={{display: this.state.requireRestart ? 'block' : 'none', color: 'red'}}>
-						Es necesario reiniciar la aplicacion.
+						{strings.restart_required}
 					</div>
 					{/*<div id="temp">Solo temporalmente.</div>*/}
 
-					<button className="btn btn-default" onClick={() => {window.close();}}>Cerrar</button>
+					<button className="btn btn-default"
+					        onClick={() => {window.close();}}>{strings.close_window}</button>
 				</div>
 				<footer className="toolbar toolbar-footer">
 					<h1 className="title">Version: </h1>

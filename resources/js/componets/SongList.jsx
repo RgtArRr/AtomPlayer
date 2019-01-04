@@ -5,6 +5,10 @@ function collect (props) {
 	return {data: props.data};
 }
 
+function sectostr (time) {
+	return ~~(time / 60) + ':' + (time % 60 < 10 ? '0' : '') + time % 60;
+}
+
 export default class SongList extends React.Component {
 	constructor (props) {
 		super(props);
@@ -36,8 +40,8 @@ export default class SongList extends React.Component {
 
 		if (data.action === 'edit') {
 			self.props.vex.dialog.prompt({
-				message: 'Nombre de Cancion',
-				placeholder: 'Es requerido',
+				message: self.props.strings.name_song,
+				placeholder: self.props.strings.is_required,
 				value: data.data.name,
 				callback: function (value) {
 					if (value !== false) {
@@ -50,7 +54,7 @@ export default class SongList extends React.Component {
 		}
 		if (data.action === 'delete') {
 			self.props.vex.dialog.confirm({
-				message: 'Desea eliminar ' + data.data.name + ' del listado de canciones?',
+				message: self.props.strings.formatString(self.props.strings.confirm_song_delete, data.data.name),
 				callback: function (value) {
 					if (value) {
 						self.props.db.deleteSong(data.data._id, function () {
@@ -76,21 +80,22 @@ export default class SongList extends React.Component {
 					<table>
 						<thead>
 						<tr>
-							<th width="80%">Nombre</th>
-							<th width="20%">Duración</th>
+							<th width="80%">{this.props.strings.table_name}</th>
+							<th width="20%">{this.props.strings.table_duration}</th>
 						</tr>
 						</thead>
 					</table>
 					<table className="table-striped">
 						<tbody>
 						{this.state.data.map((k, j) =>
-								<tr key={k._id} className={this.state.current === k._id ? 'song_selected' : ''}>
-									<td onDoubleClick={() => {this.ondblclickSong(k._id);}}>
+								<tr key={k._id} className={this.state.current === k._id ? 'song_selected' : ''}
+								    onDoubleClick={() => {this.ondblclickSong(k._id);}}>
+									<td style={{width: '80%'}}>
 										<ContextMenuTrigger key={k._id} id="contexmenu_song" collect={collect} data={k}>
 											{k.name}
 										</ContextMenuTrigger>
 									</td>
-									<td>{0}</td>
+									<td>{k.duration ? sectostr(Math.round(k.duration)) : '-:-'}</td>
 								</tr>
 							,
 						)}
@@ -99,10 +104,10 @@ export default class SongList extends React.Component {
 				</div>,
 				<ContextMenu key={'contexmenu_song'} id="contexmenu_song">
 					<MenuItem onClick={this.handleClick} data={{action: 'edit'}}>
-						Renombrar
+						{this.props.strings.rename}
 					</MenuItem>
 					<MenuItem onClick={this.handleClick} data={{action: 'delete'}}>
-						Eliminar
+						{this.props.strings.delete}
 					</MenuItem>
 				</ContextMenu>,
 			]
