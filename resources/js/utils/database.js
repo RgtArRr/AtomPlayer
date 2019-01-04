@@ -17,9 +17,9 @@ module.exports = function () {
 				self.db.find({type: 'config', identifier: 'folder'}, function (err, docs) {
 					if (docs.length === 0) {
 						self.db.insert({type: 'playlist', identifier: 'folder', folder});
-						if (readyCallback) {
-							readyCallback();
-						}
+					}
+					if (readyCallback) {
+						readyCallback();
 					}
 				});
 			});
