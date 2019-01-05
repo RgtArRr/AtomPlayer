@@ -53,13 +53,13 @@ class Settings extends React.Component {
 			let state = self.state;
 			let temp;
 			temp = docs.find(o => o.identifier === 'medianexttrack');
-			state.medianexttrack = temp ? temp.value[0] : null;
+			state.medianexttrack = temp ? temp.value : null;
 			temp = docs.find(o => o.identifier === 'mediaplaypause');
-			state.mediaplaypause = temp ? temp.value[0] : null;
+			state.mediaplaypause = temp ? temp.value : null;
 			temp = docs.find(o => o.identifier === 'mediaprevioustrack');
-			state.mediaprevioustrack = temp ? temp.value[0] : null;
+			state.mediaprevioustrack = temp ? temp.value : null;
 			temp = docs.find(o => o.identifier === 'folder');
-			state.folder = temp ? temp.value[0] : null;
+			state.folder = temp ? temp.value : null;
 			self.setState(state);
 		});
 	}

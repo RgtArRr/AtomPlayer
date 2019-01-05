@@ -10,7 +10,7 @@
     "react_build": "webpack -p --config ./webpack.config.js --mode production",
     "dist:linux64": "electron-zip-packager  . --arch=x64 --platform=linux  --overwrite --prune --out=build/ --icon=icono.png",
     "dist:win64": "electron-zip-packager  . --arch=x64 --platform=win32  --overwrite --prune --out=build/ --icon=icono.ico",
-    "dist:mac": "electron-packager  . --arch=x64 --platform=mas  --overwrite --prune --out=build/ --icon=icono.ico && electron-installer-zip build/atomplayer-mas-x64/ build/atomplayer-mac-x64.zip",
+    "dist:mac": "electron-packager  . --arch=x64 --platform=mas  --overwrite --prune --out=build/ --icon=icono.icns && electron-installer-zip build/atomplayer-mas-x64/ build/atomplayer-mac-x64.zip",
     "dist": "npm run dist:linux64 && npm run dist:win64 && npm run dist:mac"
   },
   "dependencies": {

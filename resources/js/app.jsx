@@ -152,7 +152,7 @@ class App extends React.Component {
 							          style={{display: (this.state.window === 'home' ? 'block' : 'none')}}/>
 							<YTdownloader db={db} vex={vex} playlist={this.state.playlist} strings={strings}
 							              style={{display: (this.state.window === 'download' ? 'block' : 'none')}}
-							              folder_download={config.find(o => o.identifier === 'folder').value[0]}
+							              folder_download={config.find(o => o.identifier === 'folder').value}
 							              folder_ffmpeg={app.getAppPath()}/>
 						</div>
 					</div>

@@ -1,4 +1,5 @@
 const electron = require('electron');
+const Datastore = require('nedb');
 const {app, globalShortcut, BrowserWindow} = electron;
 
 const ipcMain = electron.ipcMain;
@@ -25,11 +26,11 @@ function createWindow () {
 	win.loadURL(`file://${__dirname}/index.html`);
 
 	// Open the DevTools.
-	// win.webContents.openDevTools();
+	//win.webContents.openDevTools();
 
 	//https://electronjs.org/docs/tutorial/devtools-extension
-	// BrowserWindow.addDevToolsExtension(
-	// 	'/home/desarrollo03/.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.4.3_0');
+	//BrowserWindow.addDevToolsExtension(
+	//	'/Users/kennethobregon/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.4.3_0');
 
 	// Emitted when the window is closed.
 	win.on('closed', () => {
@@ -76,7 +77,7 @@ function createWindow () {
 		});
 		settingsWindow.loadURL(`file://${__dirname}/settings.html`);
 		settingsWindow.show();
-		// settingsWindow.webContents.openDevTools();
+		//settingsWindow.webContents.openDevTools();
 		settingsWindow.on('closed', function () {
 			settingsWindow = null;
 		});
@@ -146,3 +147,8 @@ for (var i = 0; i < options.length; ++i) {
 		app.commandLine.appendSwitch(options[i][0], options[i][1]);
 	}
 }
+
+//database filesystem
+let fileDB = app.getAppPath() + '/resources/db/data.store';
+const globalAny = global;
+globalAny.db = new Datastore({filename: fileDB, timestampData: true});

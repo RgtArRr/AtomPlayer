@@ -1,17 +1,16 @@
-const Datastore = require('nedb');
+const remote = require('electron').remote;
 const {app} = require('electron').remote;
 
-function modulo(index, bounds) {
+function modulo (index, bounds) {
 	return (index % bounds + bounds) % bounds;
 }
 
 module.exports = function () {
 	const self = this;
 	this.db;
-	let fileDB = app.getAppPath() + '/resources/db/data.store';
 
 	this.init = function (readyCallback) {
-		self.db = new Datastore({filename: fileDB, timestampData: true});
+		self.db = remote.getGlobal('db');
 		self.db.loadDatabase(function () {
 			self.db.find({type: 'playlist'}, function (err, docs) {
 				if (docs.length === 0) {
@@ -20,14 +19,13 @@ module.exports = function () {
 				let folder = app.getPath('music');
 				self.db.find({type: 'config', identifier: 'folder'}, function (err, docs) {
 					if (docs.length === 0) {
-						self.db.insert({type: 'playlist', identifier: 'folder', folder});
+						self.db.insert({type: 'config', identifier: 'folder', value: folder});
 					}
 					if (readyCallback) {
 						readyCallback();
 					}
 				});
 			});
-
 		});
 	};
 	/*
@@ -188,5 +186,4 @@ module.exports = function () {
 		// this.writeDB(
 		// 	'INSERT OR REPLACE INTO lyrics(id_cancion, url_lyrics) VALUES(\'' + id_song + '\', \'' + url + '\')');
 	};
-}
-;
+};
