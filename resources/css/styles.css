@@ -46,6 +46,12 @@ td {
     overflow: hidden;
 }
 
+.table_header {
+    position: sticky;
+    top: 0px;
+    left: 0px;
+}
+
 .currentSong {
     background: #4B95E5 !important;
     color: #EDF4FC;

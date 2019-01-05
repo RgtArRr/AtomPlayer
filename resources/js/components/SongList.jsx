@@ -16,7 +16,7 @@ export default class SongList extends React.Component {
 
         this.updateSongs = this.updateSongs.bind(this);
         this.handleClick = this.handleClick.bind(this);
-        this.ondblclickSong = this.ondblclickSong.bind(this);
+        this.ondblclickSong = this.ondblclickSong.bind(this );
     }
 
     componentDidMount () {
@@ -76,8 +76,8 @@ export default class SongList extends React.Component {
     render () {
         return (
             [
-                <div key={'div_table'} className="table-wrapper fill" style={this.props.style}>
-                    <table>
+                <div key={'div_table'} style={this.props.style}>
+                    <table class="table_header">
                         <thead>
                         <tr>
                             <th width="80%">{this.props.strings.table_name}</th>
