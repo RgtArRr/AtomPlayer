@@ -1,10 +1,10 @@
 console.log(process.versions.electron);
 import React from 'react';
 import { render } from 'react-dom';
-import SongList from './componets/SongList';
-import PlayList from './componets/PlayList';
-import Player from './componets/Player';
-import YTdownloader from './componets/YTdownloader';
+import SongList from './components/SongList';
+import PlayList from './components/PlayList';
+import Player from './components/Player';
+import YTdownloader from './components/YTdownloader';
 
 const {dialog} = require('electron').remote;
 const {app} = require('electron').remote;
