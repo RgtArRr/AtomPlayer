@@ -21,165 +21,165 @@ const db = new Database();
 let config = null;
 
 function MenuBoton (props) {
-	return (
-		<button className={'btn btn-' + props.class} onClick={() => { props.action(); }}>
-			<span className={'icon icon-' + props.icon}> {props.text}</span>
-		</button>
-	);
+    return (
+        <button className={'btn btn-' + props.class} onClick={() => { props.action(); }}>
+            <span className={'icon icon-' + props.icon}> {props.text}</span>
+        </button>
+    );
 }
 
 class App extends React.Component {
-	constructor (props) {
-		super(props);
-		this.state = {playlist: null, window: 'home'};
-		this.config = null;
-		this.childSongList = React.createRef();
-		this.childPlayer = React.createRef();
+    constructor (props) {
+        super(props);
+        this.state = {playlist: null, window: 'home'};
+        this.config = null;
+        this.childSongList = React.createRef();
+        this.childPlayer = React.createRef();
 
-		this.homeAction = this.homeAction.bind(this);
-		this.donwloadAction = this.donwloadAction.bind(this);
-		this.settingAction = this.settingAction.bind(this);
+        this.homeAction = this.homeAction.bind(this);
+        this.donwloadAction = this.donwloadAction.bind(this);
+        this.settingAction = this.settingAction.bind(this);
 
-		this.folderAction = this.folderAction.bind(this);
-		this.onChangePlayList = this.onChangePlayList.bind(this);
-		this.ondblclickSong = this.ondblclickSong.bind(this);
-		this.toggleWindowSize = this.toggleWindowSize.bind(this);
-	}
+        this.folderAction = this.folderAction.bind(this);
+        this.onChangePlayList = this.onChangePlayList.bind(this);
+        this.ondblclickSong = this.ondblclickSong.bind(this);
+        this.toggleWindowSize = this.toggleWindowSize.bind(this);
+    }
 
-	componentDidMount () {
-		ipcRenderer.on('medianexttrack', function () {
-			this.childPlayer.current.changeSong('next');
-		});
+    componentDidMount () {
+        ipcRenderer.on('medianexttrack', function () {
+            this.childPlayer.current.changeSong('next');
+        });
 
-		ipcRenderer.on('mediaplaypause', function () {
-			this.childPlayer.current.play();
-		});
+        ipcRenderer.on('mediaplaypause', function () {
+            this.childPlayer.current.play();
+        });
 
-		ipcRenderer.on('mediaprevioustrack', function () {
-			this.childPlayer.current.changeSong('prev');
-		});
-	}
+        ipcRenderer.on('mediaprevioustrack', function () {
+            this.childPlayer.current.changeSong('prev');
+        });
+    }
 
-	homeAction () {
-		let state = this.state;
-		state.window = 'home';
-		this.setState(state);
-	}
+    homeAction () {
+        let state = this.state;
+        state.window = 'home';
+        this.setState(state);
+    }
 
-	donwloadAction () {
-		let state = this.state;
-		state.window = 'download';
-		this.setState(state);
-	}
+    donwloadAction () {
+        let state = this.state;
+        state.window = 'download';
+        this.setState(state);
+    }
 
-	settingAction () {
-		ipcRenderer.sendSync('openSettings', {});
-	}
+    settingAction () {
+        ipcRenderer.sendSync('openSettings', {});
+    }
 
-	folderAction () {
-		let self = this;
-		if (self.state.playlist !== null) {
-			dialog.showOpenDialog({
-				title: strings.choose_song,
-				properties: ['openFile', 'multiSelections'],
-				filters: [{name: strings.song, extensions: ['mp3']}],
-			}, function (e) {
-				if (e) {
-					let temp = [];
-					e.forEach(function (k) {
-						//TODO: support more audio extensions files
-						//Check extension file
-						if (k.substr(k.length - 4) === '.mp3') {
-							let name = k.split(/(\\|\/)/g).pop();
-							name = name.substr(0, name.length - 4);
-							temp.push({type: 'song', path: k, name: name, playlist: self.state.playlist});
-						}
-					});
-					db.addSongs(temp);
-					self.childSongList.current.updateSongs();
-				}
-			});
-		} else {
-			vex.dialog.alert(strings.select_playlist);
-		}
-	}
+    folderAction () {
+        let self = this;
+        if (self.state.playlist !== null) {
+            dialog.showOpenDialog({
+                title: strings.choose_song,
+                properties: ['openFile', 'multiSelections'],
+                filters: [{name: strings.song, extensions: ['mp3']}],
+            }, function (e) {
+                if (e) {
+                    let temp = [];
+                    e.forEach(function (k) {
+                        //TODO: support more audio extensions files
+                        //Check extension file
+                        if (k.substr(k.length - 4) === '.mp3') {
+                            let name = k.split(/(\\|\/)/g).pop();
+                            name = name.substr(0, name.length - 4);
+                            temp.push({type: 'song', path: k, name: name, playlist: self.state.playlist});
+                        }
+                    });
+                    db.addSongs(temp);
+                    self.childSongList.current.updateSongs();
+                }
+            });
+        } else {
+            vex.dialog.alert(strings.select_playlist);
+        }
+    }
 
-	onChangePlayList (_id) {
-		let state = this.state;
-		state.playlist = _id;
-		this.setState(state, function () {
-			//trigger for update song list
-			this.childSongList.current.updateSongs();
-		});
-	}
+    onChangePlayList (_id) {
+        let state = this.state;
+        state.playlist = _id;
+        this.setState(state, function () {
+            //trigger for update song list
+            this.childSongList.current.updateSongs();
+        });
+    }
 
-	ondblclickSong (_id) {
-		this.childPlayer.current.loadSong(_id);
-	}
+    ondblclickSong (_id) {
+        this.childPlayer.current.loadSong(_id);
+    }
 
-	toggleWindowSize () {
-		ipcRenderer.sendSync('toogleMode', {});
-	}
+    toggleWindowSize () {
+        ipcRenderer.sendSync('toogleMode', {});
+    }
 
-	render () {
-		console.log('render app');
-		return (
-			[
-				<header key={'main_toolbar'} className="toolbar toolbar-header" style={{WebkitAppRegion: 'drag'}}>
-					<h1 className="title">AtomPlayer</h1>
-					<div className="toolbar-actions">
-						<div className="btn-group">
-							<MenuBoton class="default" action={() => {this.homeAction();}} icon="home"/>
-							<MenuBoton class="default" action={() => {this.folderAction();}} icon="folder"/>
-							<MenuBoton class="default" action={() => {this.donwloadAction();}} icon="download"/>
-						</div>
-						{/*<MenuBoton class="default pull-right" action={this.homeAction()} icon="arrows-ccw"*/}
-						{/*text={'Actualizar'}/>*/}
-						<MenuBoton class="default pull-right" action={this.toggleWindowSize} icon="popup"/>
-						<MenuBoton class="default pull-right" action={this.settingAction} icon="cog"/>
-					</div>
-				</header>,
-				<div key={'main_playlist'} className="window-content" style={{height: '470px'}}>
-					<div className="pane-group">
-						<div className="pane pane-sm sidebar">
-							<PlayList db={db} vex={vex} playlist={this.state.playlist} strings={strings}
-							          onChangePlayList={this.onChangePlayList}/>
-						</div>
-						<div className="pane">
-							<SongList db={db} vex={vex} playlist={this.state.playlist} ref={this.childSongList}
-							          strings={strings}
-							          ondblclickSong={this.ondblclickSong}
-							          style={{display: (this.state.window === 'home' ? 'block' : 'none')}}/>
-							<YTdownloader db={db} vex={vex} playlist={this.state.playlist} strings={strings}
-							              style={{display: (this.state.window === 'download' ? 'block' : 'none')}}
-							              folder_download={config.find(o => o.identifier === 'folder').value}
-							              folder_ffmpeg={app.getAppPath()}/>
-						</div>
-					</div>
-				</div>,
-				<footer key={'main_footer'} className="toolbar toolbar-footer"
-				        style={{minHeight: '75px', WebkitAppRegion: 'no-drag'}}>
-					{/*<button className="btn" id="toggleLyrics">*/}
-					{/*<span className="icon icon-note-beamed"></span>&nbsp;Letras*/}
-					{/*</button>*/}
-					<div className="toolbar-actions player">
-						<Player db={db} ref={this.childPlayer} toggleWindowSize={this.toggleWindowSize}
-						        songlist={this.childSongList}/>
-					</div>
-				</footer>,
-			]
+    render () {
+        console.log('render app');
+        return (
+            [
+                <header key={'main_toolbar'} className="toolbar toolbar-header" style={{WebkitAppRegion: 'drag'}}>
+                    <h1 className="title">AtomPlayer</h1>
+                    <div className="toolbar-actions">
+                        <div className="btn-group">
+                            <MenuBoton class="default" action={() => {this.homeAction();}} icon="home"/>
+                            <MenuBoton class="default" action={() => {this.folderAction();}} icon="folder"/>
+                            <MenuBoton class="default" action={() => {this.donwloadAction();}} icon="download"/>
+                        </div>
+                        {/*<MenuBoton class="default pull-right" action={this.homeAction()} icon="arrows-ccw"*/}
+                        {/*text={'Actualizar'}/>*/}
+                        <MenuBoton class="default pull-right" action={this.toggleWindowSize} icon="popup"/>
+                        <MenuBoton class="default pull-right" action={this.settingAction} icon="cog"/>
+                    </div>
+                </header>,
+                <div key={'main_playlist'} className="window-content" style={{height: '470px'}}>
+                    <div className="pane-group">
+                        <div className="pane pane-sm sidebar">
+                            <PlayList db={db} vex={vex} playlist={this.state.playlist} strings={strings}
+                                      onChangePlayList={this.onChangePlayList}/>
+                        </div>
+                        <div className="pane">
+                            <SongList db={db} vex={vex} playlist={this.state.playlist} ref={this.childSongList}
+                                      strings={strings}
+                                      ondblclickSong={this.ondblclickSong}
+                                      style={{display: (this.state.window === 'home' ? 'block' : 'none')}}/>
+                            <YTdownloader db={db} vex={vex} playlist={this.state.playlist} strings={strings}
+                                          style={{display: (this.state.window === 'download' ? 'block' : 'none')}}
+                                          folder_download={config.find(o => o.identifier === 'folder').value}
+                                          folder_ffmpeg={app.getAppPath()}/>
+                        </div>
+                    </div>
+                </div>,
+                <footer key={'main_footer'} className="toolbar toolbar-footer"
+                        style={{minHeight: '75px', WebkitAppRegion: 'no-drag'}}>
+                    {/*<button className="btn" id="toggleLyrics">*/}
+                    {/*<span className="icon icon-note-beamed"></span>&nbsp;Letras*/}
+                    {/*</button>*/}
+                    <div className="toolbar-actions player">
+                        <Player db={db} ref={this.childPlayer} toggleWindowSize={this.toggleWindowSize}
+                                songlist={this.childSongList}/>
+                    </div>
+                </footer>,
+            ]
 
-		);
-	}
+        );
+    }
 }
 
 db.init(function () {
-	db.getConfig(function (data) {
-		config = data;
-		render((<App></App>),
-			document.getElementById('root'),
-		);
-	});
+    db.getConfig(function (data) {
+        config = data;
+        render((<App></App>),
+            document.getElementById('root'),
+        );
+    });
 });
 
 //#########################OLD CODE. WILL BE REMOVE SOON
@@ -786,6 +786,6 @@ setInterval(function () {
 
 //Ejecutar inmediatamente una funcion
 function setNewInterval (fn, delay) {
-	fn();
-	return setInterval(fn, delay);
+    fn();
+    return setInterval(fn, delay);
 }
