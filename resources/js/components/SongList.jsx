@@ -77,7 +77,7 @@ export default class SongList extends React.Component {
         return (
             [
                 <div key={'div_table'} style={this.props.style}>
-                    <table class="table_header">
+                    <table className="table_header">
                         <thead>
                         <tr>
                             <th width="80%">{this.props.strings.table_name}</th>

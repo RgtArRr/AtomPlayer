@@ -16,8 +16,8 @@ export default class Player extends React.Component {
             seekValue: 0,
             shuffle: false,
             playing: false,
-            controlVolumen: false,
-            volumen: 1,
+            controlVolume: false,
+            volume: 1,
         };
 
         this.audioPlayer = React.createRef();
@@ -27,9 +27,9 @@ export default class Player extends React.Component {
         this.changeSong = this.changeSong.bind(this);
         this.seek = this.seek.bind(this);
         this.toggleShuffle = this.toggleShuffle.bind(this);
-        this.toggleControlVolumen = this.toggleControlVolumen.bind(this);
-        this.toggleVolumen = this.toggleVolumen.bind(this);
-        this.onChangeVolumen = this.onChangeVolumen.bind(this);
+        this.toggleControlVolume = this.toggleControlVolume.bind(this);
+        this.toggleVolume = this.toggleVolume.bind(this);
+        this.onChangeVolume = this.onChangeVolume.bind(this);
     }
 
     componentDidMount () {
@@ -133,22 +133,22 @@ export default class Player extends React.Component {
         this.setState(state);
     }
 
-    onChangeVolumen (e) {
+    onChangeVolume (e) {
         let state = this.state;
-        state.volumen = e.target.value;
+        state.volume = e.target.value;
         this.setState(state);
-        this.audioPlayer.current.volumen = e.target.value;
+        this.audioPlayer.current.volume = e.target.value;
     }
 
-    toggleVolumen () {
+    toggleVolume () {
         // 	let state = this.state;
-        // 	state.volumen = !state.volumen;
+        // 	state.volume = !state.volume;
         // 	this.setState(state);
     }
 
-    toggleControlVolumen () {
+    toggleControlVolume () {
         let state = this.state;
-        state.controlVolumen = !state.controlVolumen;
+        state.controlVolume = !state.controlVolume;
         this.setState(state);
     }
 
@@ -181,13 +181,13 @@ export default class Player extends React.Component {
                         <span className="icon icon-shuffle"></span>
                     </button>
                     <button className="btn btn-default"
-                            onMouseOver={this.toggleControlVolumen}
-                            onMouseOut={this.toggleControlVolumen}>
-						<span className={'icon' + (this.state.volumen > 0 ? ' icon-sound' : ' icon-mute')}
-                              onClick={this.toggleVolumen}></span>
+                            onMouseOver={this.toggleControlVolume}
+                            onMouseOut={this.toggleControlVolume}>
+						<span className={'icon' + (this.state.volume > 0 ? ' icon-sound' : ' icon-mute')}
+                              onClick={this.toggleVolume}></span>
                         <input className="volumen_range" type="range" min="0" max="1" step="0.1"
-                               onChange={this.onChangeVolumen}
-                               style={{display: this.state.controlVolumen ? 'block' : 'none'}}/>
+                               onChange={this.onChangeVolume}
+                               style={{display: this.state.controlVolume ? 'block' : 'none'}}/>
                     </button>
                     <button className="btn maximize" style={{display: 'none'}} onClick={this.props.toggleWindowSize}>
                         <span className="icon icon-window"></span>
