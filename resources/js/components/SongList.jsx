@@ -87,7 +87,7 @@ export default class SongList extends React.Component {
                     </table>
                     <table className="table-striped">
                         <tbody>
-                        {this.state.data.map((k, j) =>
+                        {this.state.data.map((k) =>
                                 <tr key={k._id} className={this.state.current === k._id ? 'song_selected' : ''}
                                     onDoubleClick={() => {this.ondblclickSong(k._id);}}>
                                     <td style={{width: '80%'}}>

@@ -12,13 +12,12 @@ export default class Player extends React.Component {
             title: null,
             currentTime: 0,
             totalTime: 0,
-            seekStatus: 0,
-            seekValue: 0,
             shuffle: false,
             playing: false,
             controlVolume: false,
             volume: 1,
         };
+        this.seekInfo = {status: 0, value: 0};
 
         this.audioPlayer = React.createRef();
 
@@ -45,9 +44,9 @@ export default class Player extends React.Component {
 
         this.audioPlayer.current.addEventListener('timeupdate', function (e) {
             let state = self.state;
-            if (state.seekStatus === 1) {
-                self.audioPlayer.current.currentTime = state.seekValue * state.totalTime;
-                state.seekStatus = 0;
+            if (self.seekInfo.status === 1) {
+                self.audioPlayer.current.currentTime = self.seekInfo.value * state.totalTime;
+                self.seekInfo.status = 0;
             }
             state.currentTime = this.currentTime;
             self.setState(state);
@@ -122,9 +121,8 @@ export default class Player extends React.Component {
     }
 
     seek (e) {
-        let percent = e.offsetX / this.offsetWidth;
-        console.log(percent);
-        // self.seekPlayer = {status: 1, value: percent};
+        let percent = e.nativeEvent.offsetX / e.target.offsetWidth;
+        this.seekInfo = {status: 1, value: percent};
     }
 
     toggleShuffle () {
@@ -162,8 +160,8 @@ export default class Player extends React.Component {
                             max={'1'}
                             onClick={this.seek}
                             style={{width: '90%'}}
-                            value={this.state.currentTime / (this.state.totalTime === 0 ? 1 : this.state.totalTime)}
-                        ></progress>
+                            value={this.state.currentTime / (this.state.totalTime === 0 ? 1 : this.state.totalTime)}>
+                        </progress>
                         <li>{sectostr(Math.round(this.state.totalTime))}</li>
                     </ul>
                     <button className="btn btn-default" onClick={() => {this.changeSong('prev');}}>
