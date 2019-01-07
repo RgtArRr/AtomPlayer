@@ -31,14 +31,25 @@ export default class YTdownloader extends React.Component {
                 'progressTimeout': 500,
             });
 
+            let sanitizeName = function(name) {
+                return name.replace(/[\/<>\|?\:"\*\\]/g, '');
+            }
+
             self.YD.on('finished', function (err, data) {
                 console.log(JSON.stringify(data));
+                let oldPath = data.file;
+                let sanitizedName = sanitizeName(data.videoTitle);
+                let newPath = path.dirname(oldPath) + '/' + sanitizedName + '.mp3';
                 let state = self.state;
                 state.downloading = false;
                 self.setState(state);
                 self.inputURL.current.value = '';
+                console.log('Renaming "' + oldPath + '" to "' + newPath + '"');
+                fs.rename(oldPath, newPath, function(err) {
+                    if ( err ) console.log('ERROR: ' + err);
+                });
                 self.props.db.addSongs([
-                    {type: 'song', path: data.file, name: data.videoTitle, playlist: self.props.playlist},
+                    {type: 'song', path: newPath, name: data.videoTitle, playlist: self.props.playlist},
                 ]);
             });
 
@@ -84,7 +95,8 @@ export default class YTdownloader extends React.Component {
             if (YTid !== null) {
                 YTid = YTid[1];
                 if (YTid.length === 11) {
-                    this.YD.download(YTid);
+                    const defaultDownloadName = 'download.tmp';
+                    this.YD.download(YTid, defaultDownloadName);
                     state.downloading = true;
                     state.percentage = 0;
                     this.setState(state);
