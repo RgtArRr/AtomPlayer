@@ -1,10 +1,19 @@
 language: node_js
 node_js:
-- "stable"
+- stable
 cache:
   directories:
   - node_modules
 script:
 - npm run react_build
-on:
+true:
   branch: master
+deploy:
+  provider: releases
+  api_key:
+    secure: kSDiM2TPopHiNPvQMXlg6yvgJM0Py9oyShsVI79D/eRFsu/F0VZe6irCDkRPxNJQ+2ocQlSTmov0TtGZg0MoNWw1lWOborh8Z9R2hYHr+POVuY/mabgvZZT0ZfgASq5MzTL2nrZENIs9I712udJUZl89/xpYCeJndLGY8FtknEEpQDGUV/X2Sb+kCSBTzl892s3dOCzhNAB1JtPZ+fW2aTYiRkTqI3DCbqMsaFEUIfzZXAuPZQrNzCSmVriC40EBf9xE/6Jpp1OK2xxdKm74pkvrzushyI2FNUyLeYZaNPOLEvKDfPh2PNwLAFY0b/WI4B37myoIRf+CqCWHVr+lVvjXK5wY/ZxMx70d1Q/TkhTudH1hQ2c48bPLSwjpMJaGzvbPEnlrbM0tHg5dzqhFoYFpuUUCbUc7rUyZP5KnWHbAZksJR+FnAC8+Mw/noMwPpzTx89+5aFg6BG5dzXMIpltUSL3CDCvqCmtYACb9DzPCxR0hWtYi5FhtsoEx7Sfs21oVZuW32dSLPCvISzeebrQ2+hSFE+VNX7fo6Nhx6odqdaY7T5/j3TneMODkuo5nMDjcRsSoPUM9yz7jzMdz4pdGEf7ve9ccCHQzzFmSmOBotvbpjKAYDcLC+kU7VsXcAHkRVZykOz6prtJYT9xftS56/daLiDDMZPPQcn1Egpk=
+  file:
+  - "resources/js/app.min.js"
+  - "resources/js/settings.min.js"
+  on:
+    repo: RgtArRr/AtomPlayer
