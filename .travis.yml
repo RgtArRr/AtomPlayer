@@ -23,5 +23,4 @@ deploy:
   - build/atomplayer-mac-x64.zip
   skip_cleanup: true
   on:
-    tags: true
     repo: RgtArRr/AtomPlayer
