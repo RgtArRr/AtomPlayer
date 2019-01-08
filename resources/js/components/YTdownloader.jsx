@@ -6,17 +6,32 @@ const os = require('os');
 const fs = require('fs');
 
 var ffbinaries = require('ffbinaries');
+String.prototype.format = function () {
+    var formatted = this;
+    for (var i = 0; i < arguments.length; i++) {
+        var regexp = new RegExp('\\{' + i + '\\}', 'gi');
+        formatted = formatted.replace(regexp, arguments[i]);
+    }
+    return formatted;
+};
 
 //https://www.youtube.com/watch?v=WMxdUmgJUfI
 export default class YTdownloader extends React.Component {
     constructor (props) {
         super(props);
-        this.state = {ready: false, downloading: false, percentage: 0};
+        this.state = {
+            ready: false,
+            downloading: false,
+            percentage: 0,
+            queue: [],
+        };
 
         this.inputURL = React.createRef();
 
         this.YD = null;
+        this.addQueue = this.addQueue.bind(this);
         this.download = this.download.bind(this);
+        this.removeFromList = this.removeFromList.bind(this);
     }
 
     componentDidMount () {
@@ -31,26 +46,36 @@ export default class YTdownloader extends React.Component {
                 'progressTimeout': 500,
             });
 
-            let sanitizeName = function(name) {
+            let sanitizeName = function (name) {
                 return name.replace(/[\/<>\|?\:"\*\\]/g, '');
-            }
+            };
 
             self.YD.on('finished', function (err, data) {
-                console.log(JSON.stringify(data));
+                console.log(data);
+                let state = self.state;
+                let current = state.queue.find(o => o.isStarted && !o.isFinished);
+                let next = state.queue.find(o => !o.isStarted && !o.isFinished);
+
+                self.inputURL.current.value = '';
                 let oldPath = data.file;
                 let sanitizedName = sanitizeName(data.videoTitle);
                 let newPath = path.dirname(oldPath) + '/' + sanitizedName + '.mp3';
-                let state = self.state;
-                state.downloading = false;
-                self.setState(state);
-                self.inputURL.current.value = '';
                 console.log('Renaming "' + oldPath + '" to "' + newPath + '"');
-                fs.rename(oldPath, newPath, function(err) {
-                    if ( err ) console.log('ERROR: ' + err);
+                fs.rename(oldPath, newPath, function (err) {
+                    if (err) {
+                        console.log('ERROR: ' + err);
+                    }
                 });
-                self.props.db.addSongs([
-                    {type: 'song', path: newPath, name: data.videoTitle, playlist: self.props.playlist},
-                ]);
+                self.props.db.addSongs(
+                    [{type: 'song', path: newPath, name: data.videoTitle, playlist: current.playlist}]);
+
+                current.isFinished = true;
+                current.name = data.videoTitle;
+                if (next) {
+                    next.isStarted = true;
+                    self.download(next.YTid);
+                }
+                self.setState(state);
             });
 
             self.YD.on('error', function (error) {
@@ -59,7 +84,8 @@ export default class YTdownloader extends React.Component {
 
             self.YD.on('progress', function (progress) {
                 let state = self.state;
-                state.percentage = progress.progress.percentage;
+                let current = state.queue.find(o => o.isStarted && !o.isFinished);
+                current.percent = progress.progress.percentage;
                 self.setState(state);
             });
 
@@ -87,7 +113,7 @@ export default class YTdownloader extends React.Component {
     componentWillUnmount () {
     }
 
-    download () {
+    addQueue () {
         if (this.props.playlist !== null) {
             let state = this.state;
             let regexRule = /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
@@ -95,10 +121,8 @@ export default class YTdownloader extends React.Component {
             if (YTid !== null) {
                 YTid = YTid[1];
                 if (YTid.length === 11) {
-                    const defaultDownloadName = 'download.tmp';
-                    this.YD.download(YTid, defaultDownloadName);
-                    state.downloading = true;
-                    state.percentage = 0;
+                    state.queue.push(
+                        {YTid: YTid, playlist: this.props.playlist, isStarted: false, isFinished: false, name: null});
                     this.setState(state);
                 }
             }
@@ -107,30 +131,66 @@ export default class YTdownloader extends React.Component {
         }
     }
 
+    download (YTid) {
+        const defaultDownloadName = 'download.tmp';
+        this.YD.download(YTid, defaultDownloadName);
+    }
+
+    removeFromList (j) {
+        let state = this.state;
+        state.queue.splice(j, 1);
+        this.setState(state);
+    }
+
     render () {
+        let self = this;
+        let state = self.state;
+        if (state.queue.find(o => o.isStarted && !o.isFinished) === undefined) {
+            let next = state.queue.find(o => !o.isStarted && !o.isFinished);
+            if (next) {
+                next.isStarted = true;
+                self.download(next.YTid);
+                self.setState(state);
+            }
+        }
+
+        let progressStyle = '-webkit-gradient(linear, left top, right top, from(#cce6cc), to(white), color-stop({0}, #cce6cc), color-stop({0}, white))';
         return (
             this.state.ready ?
                 <div className="ytdownloadercontainer" style={this.props.style}>
                     <div className="form-group">
                         <label>{this.props.strings.ytdownload_explain}</label>
-                        <input type="text" className="form-control"
-                               placeholder={this.props.strings.ytdownload_instructions}
-                               ref={this.inputURL}/>
+                        <input type="text" className="form-control" ref={this.inputURL}
+                               placeholder={this.props.strings.ytdownload_instructions}/>
                     </div>
-                    <button className="btn btn-form btn-primary" onClick={this.download}
-                            style={{display: this.state.downloading ? 'none' : 'block'}}>
+                    <button className="btn btn-form btn-primary"
+                            style={{display: this.state.downloading ? 'none' : 'block'}} onClick={this.addQueue}>
                         {this.props.strings.download}
                     </button>
-                    <div className="progress" style={{display: this.state.downloading ? 'block' : 'none'}}>
-                        <div className={'c100 p' + Math.round(this.state.percentage)}>
-                            <span>{Math.round(this.state.percentage)}</span>
-                            <div className="slice">
-                                <div className="bar"></div>
-                                <div className="fill"></div>
-                            </div>
-                            <div className="back"></div>
-                        </div>
-                    </div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <td style={{textAlign: 'center'}}><span className="icon icon-note-beamed"></span></td>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {this.state.queue.map((k, j) =>
+                            <tr style={{
+                                backgroundImage: k.percent !== 100
+                                    ? progressStyle.format(Math.round(k.percent) / 100)
+                                    : 'linear-gradient(#82c782, #82c782)',
+                            }}>
+                                <td style={{whiteSpace: 'normal'}}>
+                                    {k.name ? k.name : k.YTid}
+                                    <span className='icon icon-cancel'
+                                          style={{float: 'right', display: k.percent === 100 ? 'block' : 'none'}}
+                                          onClick={() => {this.removeFromList(j);}}></span>
+                                </td>
+                            </tr>,
+                        )}
+                        </tbody>
+                    </table>
                 </div>
                 : <span style={this.props.style}>{this.props.strings.ytdownload_loading}</span>
         );
