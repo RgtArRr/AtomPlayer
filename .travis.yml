@@ -4,15 +4,24 @@ node_js:
 cache:
   directories:
   - node_modules
+sudo: required
+addons:
+  apt:
+    packages:
+    - wine1.6
 script:
 - npm run react_build
+- npm run dist
 true:
   branch: master
 deploy:
   provider: releases
-  api_key:
-    secure: SQXYzpNj7+vh8REb18OgwY0oGcLbaDutkyRYFV//+1i4WSu0wn+cwt93UJqKRA2TslXAqXAlCUHBGSyeCmf6IvnXWN7cpqdfqq5135YshwMK6yOKa9olm6m9isBCvFKjFrqqzT4su7JkYahKtLSHxrtyEyBk4qQOUKnTGVfexL+XoAE/bLd03PGUxXFthMIXAgYCDTfvE7UaqpmOV1r96EK6XB9+48BxpWbY/BPiukyehRUjyUxupUK/MsObf56V1N3tTvjMcrtCC7DvWC2L9r5TjVqWjW8wv5shOjgRwfeF91VheziOAqP812NJhuzKIMLB18SsJtpq355jo8rgXZNzAjGsnD3OiS9BipKFyD1e053i5MO0RBH79SNwsbdbSU3ik+G2kURkRYffgjW3ZaleNYh6CSvlvQ0orzal0MeJ3qy2H7ZwO0pYuiDFnp39o9Z+glTNOzb4IUy65a/UwDTICb+nwo4vMVu7fmw0EE8O82fowTJp5PmbYUlzEYe0Er9bxAqsN3n6v6qkLZqo5l3hb9onUOH3DNzrNwjV+zQAUr831pVRpQf9mP9nj0/4NXXIa8t+C1uXzyyl6/tqYywm1VfMM3fZqttKfML+EodxJs1+4VqMgf+X8IQ9mOi8fctLXgOIlGYa9yw2E1dLn+XDU6q4578ej38rOKviJqU=
-  file: resources/js/app.min.js
+  api_key: $GITHUB_OAUTH_TOKEN
+  file:
+  - build/atomplayer-linux-x64.zip
+  - build/atomplayer-win32-x64.zip
+  - build/atomplayer-mac-x64.zip
   skip_cleanup: true
   on:
+    all_branches: true
     repo: RgtArRr/AtomPlayer
