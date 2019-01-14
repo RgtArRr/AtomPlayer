@@ -1,7 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
 
-const ipcRenderer = require('electron').ipcRenderer;
 const {app} = require('electron').remote;
 const {dialog} = require('electron').remote;
 const {getKey} = require('./utils/keycode');
