@@ -32,7 +32,6 @@ class App extends React.Component {
     constructor (props) {
         super(props);
         this.state = {playlist: null, window: 'home'};
-        this.config = null;
         this.childSongList = React.createRef();
         this.childPlayer = React.createRef();
 
@@ -47,6 +46,20 @@ class App extends React.Component {
     }
 
     componentDidMount () {
+        let conf;
+
+        conf = config.find(o => o.identifier === 'medianexttrack');
+        conf = conf ? conf.value : 'medianexttrack';
+        ipcRenderer.sendSync('registerShortcut', {'key': conf, 'channel': 'medianexttrack'});
+
+        conf = config.find(o => o.identifier === 'mediaprevioustrack');
+        conf = conf ? conf.value : 'mediaprevioustrack';
+        ipcRenderer.sendSync('registerShortcut', {'key': conf, 'channel': 'mediaprevioustrack'});
+
+        conf = config.find(o => o.identifier === 'mediaplaypause');
+        conf = conf ? conf.value : 'mediaplaypause';
+        ipcRenderer.sendSync('registerShortcut', {'key': conf, 'channel': 'mediaplaypause'});
+
         ipcRenderer.on('medianexttrack', function () {
             this.childPlayer.current.changeSong('next');
         });
@@ -168,7 +181,6 @@ class App extends React.Component {
                     </div>
                 </footer>,
             ]
-
         );
     }
 }
