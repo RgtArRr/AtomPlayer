@@ -6,21 +6,13 @@ import PlayList from './components/PlayList';
 import Player from './components/Player';
 import YTdownloader from './components/YTdownloader';
 
-const https = require('https');
 const {dialog} = require('electron').remote;
 const {app} = require('electron').remote;
-const {clipboard} = require('electron');
 const ipcRenderer = require('electron').ipcRenderer;
 const Database = require('./utils/database');
 const {strings} = require('./utils/locale');
+const {updater} = require('./utils/updater');
 const vex = require('vex-js');
-const semver = require('semver');
-const os = require('os');
-const isDev = require('electron-is-dev');
-const unzipper = require('unzipper');
-const mkdir = require('mkdirp');
-const fs = require('fs');
-const path = require('path');
 
 vex.registerPlugin(require('vex-dialog'));
 vex.defaultOptions.className = 'vex-theme-os';
@@ -34,69 +26,6 @@ function MenuBoton (props) {
             <span className={'icon icon-' + props.icon}></span> {props.text}
         </button>
     );
-}
-
-function updater () {
-    if (!isDev) {
-        https.get(
-            {
-                host: 'api.github.com',
-                path: '/repos/RgtArRr/AtomPlayer/releases/latest',
-                headers: {'user-agent': 'atomplayer'},
-            }, (resp) => {
-                let data = '';
-                resp.on('data', (chunk) => {
-                    data += chunk;
-                });
-                resp.on('end', () => {
-                    data = JSON.parse(data);
-                    if (semver.gt(data.tag_name.substr(1), app.getVersion())) {
-                        let update = data.assets.find((o) => o.name.indexOf(os.platform()) !== -1);
-                        if (update) {
-                            let file_tmp = app.getPath('downloads') + '/temp_atomplayer_update.zip';
-                            let file = fs.createWriteStream(file_tmp);
-                            https.get(update.browser_download_url, function (redirect) {
-                                https.get(redirect.headers.location, function (response) {
-                                    response.on('data', function (data) {
-                                        file.write(data);
-                                    }).on('end', function () {
-                                        file.close(function () {
-                                            let appPath = app.getPath('exe').split('/');
-                                            appPath.pop();
-                                            appPath = appPath.join('/');
-                                            fs.createReadStream(file_tmp).
-                                                pipe(unzipper.Parse()).
-                                                on('entry', function (entry) {
-                                                    let fileName = entry.path;
-                                                    let type = entry.type;
-                                                    if (type === 'File' && fileName.indexOf('resources/app') !== -1) {
-                                                        let fullPath = appPath + path.dirname(fileName);
-                                                        fileName = path.basename(fileName);
-                                                        mkdir.sync(fullPath);
-                                                        entry.pipe(fs.createWriteStream(fullPath + '/' + fileName));
-                                                    } else {
-                                                        entry.autodrain();
-                                                    }
-                                                }).
-                                                promise().
-                                                then(function () {
-                                                    vex.dialog.alert(strings.restart_required);
-                                                }, function (e) {
-                                                    console.log('error', e);
-                                                });
-                                        });
-                                    });
-                                });
-                            });
-                        }
-
-                    }
-                });
-            },
-        ).on('error', (err) => {
-            console.log('Error: ' + err.message);
-        });
-    }
 }
 
 class App extends React.Component {
@@ -204,7 +133,8 @@ class App extends React.Component {
                             <MenuBoton class="default" action={() => {this.folderAction();}} icon="folder"/>
                             <MenuBoton class="default" action={() => {this.donwloadAction();}} icon="download"/>
                         </div>
-                        <MenuBoton class="default pull-right" action={updater} icon="arrows-ccw" text={strings.update}/>
+                        <MenuBoton class="default pull-right" action={() => {updater(vex);}} icon="arrows-ccw"
+                                   text={strings.update}/>
                         <MenuBoton class="default pull-right" action={this.toggleWindowSize} icon="popup"/>
                         <MenuBoton class="default pull-right" action={this.settingAction} icon="cog"/>
                     </div>
