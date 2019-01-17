@@ -1,11 +1,11 @@
 import React from 'react';
 
 const path = require('path');
-const YoutubeMp3Downloader = require('youtube-mp3-downloader');
 const os = require('os');
 const fs = require('fs');
+const YoutubeMp3Downloader = require('youtube-mp3-downloader');
+const ffbinaries = require('ffbinaries');
 
-var ffbinaries = require('ffbinaries');
 String.prototype.format = function () {
     var formatted = this;
     for (var i = 0; i < arguments.length; i++) {
@@ -124,6 +124,7 @@ export default class YTdownloader extends React.Component {
                     state.queue.push(
                         {YTid: YTid, playlist: this.props.playlist, isStarted: false, isFinished: false, name: null});
                     this.setState(state);
+                    this.inputURL.current.value = '';
                 }
             }
         } else {
