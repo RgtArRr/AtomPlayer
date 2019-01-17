@@ -32,6 +32,8 @@ let strings = new LocalizedStrings({
         restart_required: 'Restart the application',
         close_window: 'Close',
         download_folder: 'Download folder',
+        update: 'Update',
+        no_updates: 'No update avaliable',
     },
     es: {
         choose_song: 'Escoge una musica',
@@ -61,6 +63,8 @@ let strings = new LocalizedStrings({
         restart_required: 'Es necesario reiniciar la aplicacion.',
         close_window: 'Cerrar',
         download_folder: 'Carpeta de descargas',
+        update: 'Actualizar',
+        no_updates: 'No hay actualizaciones disponibles',
     },
 });
 

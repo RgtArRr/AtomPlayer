@@ -60,7 +60,6 @@ function createWindow () {
 	});
 
 	//Open Settings Window
-	let settingsWindow;
 	ipcMain.on('openSettings', function (eventRet, arg) {
 		let settingsWindow = new BrowserWindow({
 			parent: win,

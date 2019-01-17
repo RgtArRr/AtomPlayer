@@ -109,6 +109,16 @@ module.exports = function () {
         });
     };
 
+    this.getSongsbySongs = function (_id, responseCallback) {
+        self.getSong(_id, function (song) {
+            if (song !== null) {
+                self.getSongs(song.playlist, function (songs) {
+                    responseCallback(songs);
+                });
+            }
+        });
+    };
+
     this.getSong = function (_id, responseCallback) {
         self.db.findOne({_id: _id}, function (err, docs) {
             responseCallback(docs);

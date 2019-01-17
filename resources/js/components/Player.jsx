@@ -4,11 +4,25 @@ function sectostr (time) {
     return ~~(time / 60) + ':' + (time % 60 < 10 ? '0' : '') + time % 60;
 }
 
+function modulo (index, bounds) {
+    return (index % bounds + bounds) % bounds;
+}
+
+function shuffleArray (array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        let temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
 export default class Player extends React.Component {
     constructor (props) {
         super(props);
         this.state = {
-            _id: '',
+            _id: null,
+            _id_playlist: null,
             title: null,
             currentTime: 0,
             totalTime: 0,
@@ -17,6 +31,9 @@ export default class Player extends React.Component {
             controlVolume: false,
             volume: 1,
         };
+
+        this.shuffle_song_list = [];
+
         this.seekInfo = {status: 0, value: 0};
 
         this.audioPlayer = React.createRef();
@@ -26,6 +43,7 @@ export default class Player extends React.Component {
         this.changeSong = this.changeSong.bind(this);
         this.seek = this.seek.bind(this);
         this.toggleShuffle = this.toggleShuffle.bind(this);
+        this.makeSuffleList = this.makeSuffleList.bind(this);
         this.toggleControlVolume = this.toggleControlVolume.bind(this);
         this.toggleVolume = this.toggleVolume.bind(this);
         this.onChangeVolume = this.onChangeVolume.bind(this);
@@ -73,8 +91,13 @@ export default class Player extends React.Component {
                 self.audioPlayer.current.load();
                 state.title = song.name;
                 state._id = song._id;
+                let b = song.playlist !== state._id_playlist && state.shuffle;
+                state._id_playlist = song.playlist;
                 state.playing = false;
                 self.setState(state, function () {
+                    if (b) {
+                        self.makeSuffleList(song._id);
+                    }
                     self.play();
                 });
                 //update song list
@@ -109,7 +132,10 @@ export default class Player extends React.Component {
         };
 
         if (this.state.shuffle) {
-            this.props.db.getRandomSong(this.state._id, success);
+            let index = self.shuffle_song_list.findIndex(k => k._id === self.state._id);
+            if (index !== -1) {
+                success(self.shuffle_song_list[modulo(index + 1, self.shuffle_song_list.length)]);
+            }
         } else {
             if (type === 'next') {
                 this.props.db.getNextSong(this.state._id, success);
@@ -128,7 +154,18 @@ export default class Player extends React.Component {
     toggleShuffle () {
         let state = this.state;
         state.shuffle = !state.shuffle;
+        if (state.shuffle) {
+            this.makeSuffleList(state._id);
+        }
         this.setState(state);
+    }
+
+    makeSuffleList (_id) {
+        let self = this;
+        this.props.db.getSongsbySongs(_id, function (data) {
+            shuffleArray(data);
+            self.shuffle_song_list = data;
+        });
     }
 
     onChangeVolume (e) {
