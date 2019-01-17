@@ -1,7 +1,7 @@
 {
   "name": "atomplayer",
   "description": "Reproductor de musica, descarga mp3 de youtube",
-  "version": "0.2.6",
+  "version": "1.0.0",
   "main": "main.js",
   "license": "Apache-2.0",
   "scripts": {
