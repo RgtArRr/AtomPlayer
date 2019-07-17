@@ -236,6 +236,17 @@ input[type=range]:focus {
     outline: none;
 }
 
+.album {
+    float: left;
+}
+
+.album > img {
+    height: 74px;
+    width: 74px;
+    padding: 5px 5px 5px 0px;
+    border-radius: 10px;
+}
+
 @media screen and (max-height: 100px) {
     .toolbar-header {
         display: none;
@@ -288,6 +299,10 @@ input[type=range]:focus {
     }
 
     #toggleLyrics {
+        display: none;
+    }
+
+    .album {
         display: none;
     }
 }
