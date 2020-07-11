@@ -4,16 +4,18 @@ import { render } from 'react-dom';
 import SongList from './components/SongList';
 import PlayList from './components/PlayList';
 import Player from './components/Player';
-import YTdownloader from './components/YTdownloader';
+import YtDownloader from './components/YtDownloader';
+import Google from './components/Google';
+import ErrorHandler from './components/ErrorHandler';
 
-const {dialog} = require('electron').remote;
 const {app} = require('electron').remote;
 const ipcRenderer = require('electron').ipcRenderer;
 const Database = require('./utils/database');
 const {strings} = require('./utils/locale');
-const {updater} = require('./utils/updater');
+const log = require('electron-log');
 const vex = require('vex-js');
 
+Object.assign(console, log.functions);
 vex.registerPlugin(require('vex-dialog'));
 vex.defaultOptions.className = 'vex-theme-os';
 
@@ -23,7 +25,7 @@ let config = null;
 function MenuBoton (props) {
     return (
         <button className={'btn btn-' + props.class} onClick={() => { props.action(); }}>
-            <span className={'icon icon-' + props.icon}></span> {props.text}
+            <span className={'icon icon-' + props.icon}/> {props.text}
         </button>
     );
 }
@@ -31,15 +33,17 @@ function MenuBoton (props) {
 class App extends React.Component {
     constructor (props) {
         super(props);
-        this.state = {playlist: null, window: 'home'};
+        this.state = {playlist: null, window: 'home', isLogin: false};
+        this.childPlayList = React.createRef();
         this.childSongList = React.createRef();
         this.childPlayer = React.createRef();
+        this.childDownloader = React.createRef();
 
         this.homeAction = this.homeAction.bind(this);
         this.donwloadAction = this.donwloadAction.bind(this);
         this.settingAction = this.settingAction.bind(this);
 
-        this.folderAction = this.folderAction.bind(this);
+        // this.folderAction = this.folderAction.bind(this);
         this.onChangePlayList = this.onChangePlayList.bind(this);
         this.ondblclickSong = this.ondblclickSong.bind(this);
         this.toggleWindowSize = this.toggleWindowSize.bind(this);
@@ -60,15 +64,15 @@ class App extends React.Component {
         conf = conf ? conf.value : 'mediaplaypause';
         ipcRenderer.sendSync('registerShortcut', {'key': conf, 'channel': 'mediaplaypause'});
 
-        ipcRenderer.on('medianexttrack', function () {
+        ipcRenderer.on('medianexttrack', () => {
             this.childPlayer.current.changeSong('next');
         });
 
-        ipcRenderer.on('mediaplaypause', function () {
+        ipcRenderer.on('mediaplaypause', () => {
             this.childPlayer.current.play();
         });
 
-        ipcRenderer.on('mediaprevioustrack', function () {
+        ipcRenderer.on('mediaprevioustrack', () => {
             this.childPlayer.current.changeSong('prev');
         });
     }
@@ -89,6 +93,7 @@ class App extends React.Component {
         ipcRenderer.sendSync('openSettings', {});
     }
 
+    /*
     folderAction () {
         let self = this;
         if (self.state.playlist !== null) {
@@ -100,7 +105,6 @@ class App extends React.Component {
                 if (e) {
                     let temp = [];
                     e.forEach(function (k) {
-                        //TODO: support more audio extensions files
                         //Check extension file
                         if (k.substr(k.length - 4) === '.mp3') {
                             let name = k.split(/(\\|\/)/g).pop();
@@ -115,7 +119,7 @@ class App extends React.Component {
         } else {
             vex.dialog.alert(strings.select_playlist);
         }
-    }
+    }*/
 
     onChangePlayList (_id) {
         let state = this.state;
@@ -143,11 +147,11 @@ class App extends React.Component {
                     <div className="toolbar-actions">
                         <div className="btn-group">
                             <MenuBoton class="default" action={() => {this.homeAction();}} icon="home"/>
-                            <MenuBoton class="default" action={() => {this.folderAction();}} icon="folder"/>
+                            {/*<MenuBoton class="default" action={() => {this.folderAction();}} icon="folder"/>*/}
                             <MenuBoton class="default" action={() => {this.donwloadAction();}} icon="download"/>
                         </div>
-                        <MenuBoton class="default pull-right" action={() => {updater(vex);}} icon="arrows-ccw"
-                                   text={strings.update}/>
+                        <Google db={db} strings={strings}
+                                playlist={this.childPlayList} downloader={this.childDownloader}/>
                         <MenuBoton class="default pull-right" action={this.toggleWindowSize} icon="popup"/>
                         <MenuBoton class="default pull-right" action={this.settingAction} icon="cog"/>
                     </div>
@@ -155,7 +159,8 @@ class App extends React.Component {
                 <div key={'main_playlist'} className="window-content" style={{height: '470px'}}>
                     <div className="pane-group">
                         <div className="pane pane-sm sidebar">
-                            <PlayList db={db} vex={vex} playlist={this.state.playlist} strings={strings}
+                            <PlayList db={db} vex={vex} ref={this.childPlayList} playlist={this.state.playlist}
+                                      strings={strings}
                                       onChangePlayList={this.onChangePlayList}/>
                         </div>
                         <div className="pane">
@@ -163,7 +168,8 @@ class App extends React.Component {
                                       strings={strings}
                                       ondblclickSong={this.ondblclickSong}
                                       style={{display: (this.state.window === 'home' ? 'block' : 'none')}}/>
-                            <YTdownloader db={db} vex={vex} playlist={this.state.playlist} strings={strings}
+                            <YtDownloader db={db} vex={vex} ref={this.childDownloader} playlist={this.state.playlist}
+                                          strings={strings}
                                           style={{display: (this.state.window === 'download' ? 'block' : 'none')}}
                                           folder_download={config.find(o => o.identifier === 'folder').value}
                                           folder_ffmpeg={app.getAppPath()}/>
@@ -188,7 +194,10 @@ class App extends React.Component {
 db.init(function () {
     db.getConfig(function (data) {
         config = data;
-        render((<App></App>),
+        render((
+                <ErrorHandler>
+                    <App/>
+                </ErrorHandler>),
             document.getElementById('root'),
         );
     });

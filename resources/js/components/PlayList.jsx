@@ -1,5 +1,6 @@
 import React from 'react';
 
+const ipcRenderer = require('electron').ipcRenderer;
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 
 function collect (props) {
@@ -11,16 +12,22 @@ export default class PlayList extends React.Component {
         super(props);
         this.state = {data: []};
 
+        this.saveToDrive = this.saveToDrive.bind(this);
         this.updatePlayLists = this.updatePlayLists.bind(this);
         this.handleClick = this.handleClick.bind(this);
     }
 
     componentDidMount () {
-        let self = this;
         this.updatePlayLists();
     }
 
     componentWillUnmount () {
+    }
+
+    saveToDrive () {
+        this.props.db.getArraySongs((res) => {
+            ipcRenderer.sendSync('saveDataToDrive', {data: res});
+        });
     }
 
     updatePlayLists () {
@@ -40,8 +47,9 @@ export default class PlayList extends React.Component {
                 placeholder: this.props.strings.id_required,
                 callback: function (value) {
                     if (value !== false) {
-                        self.props.db.addPlayList(value, function () {
+                        self.props.db.addPlayList(value, null, function () {
                             self.updatePlayLists();
+                            self.saveToDrive();
                         });
                     }
                 },
@@ -54,8 +62,10 @@ export default class PlayList extends React.Component {
                 value: data.data.name,
                 callback: function (value) {
                     if (value !== false) {
+                        console.log(data.data._id, value);
                         self.props.db.changeNamePlayList(data.data._id, value, function () {
-                            self.updatePlayList();
+                            self.updatePlayLists();
+                            self.saveToDrive();
                         });
                     }
                 },
@@ -68,6 +78,7 @@ export default class PlayList extends React.Component {
                     if (value) {
                         self.props.db.deletePlayList(data.data._id, function () {
                             self.updatePlayLists();
+                            self.saveToDrive();
                         });
                     }
                 },
@@ -89,13 +100,13 @@ export default class PlayList extends React.Component {
                     <h5 className="nav-group-title">Playlists</h5>
                     <button style={button_add_style} className="btn btn-default"
                             onClick={() => {this.handleClick(this, {action: 'add'});}}>
-                        <span className="icon icon-plus"></span>
+                        <span className="icon icon-plus"/>
                     </button>
                     {this.state.data.map((k, j) =>
                         <ContextMenuTrigger key={k._id} id="contexmenu_playlist" collect={collect} data={k}>
                             <a className={'nav-group-item' + (this.props.playlist === k._id ? ' active' : '')}
                                onClick={() => {this.props.onChangePlayList(k._id);}}>
-                                <span className="icon icon-menu"></span>
+                                <span className="icon icon-menu"/>
                                 {k.name}
                             </a>
                         </ContextMenuTrigger>,

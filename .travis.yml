@@ -11,16 +11,14 @@ addons:
     - wine1.6
 script:
 - npm run react_build
-- npm run dist
+- npm run dist:test
 true:
   branch: master
 deploy:
   provider: releases
   api_key: $GITHUB_OAUTH_TOKEN
   file:
-  - build/atomplayer-linux-x64.zip
-  - build/atomplayer-win32-x64.zip
-  - build/atomplayer-mac-x64.zip
+  - build/AtomPlayer-win.exe
   skip_cleanup: true
   on:
     repo: RgtArRr/AtomPlayer

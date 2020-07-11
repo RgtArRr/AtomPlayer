@@ -1,7 +1,7 @@
 {
   "name": "atomplayer",
   "description": "Reproductor de musica, descarga mp3 de youtube",
-  "version": "1.1.0",
+  "version": "1.3.0",
   "main": "main.js",
   "license": "Apache-2.0",
   "scripts": {
@@ -10,35 +10,39 @@
     "react_build": "webpack -p --config ./webpack.config.js --mode production",
     "dist:linux64": "electron-zip-packager  . --arch=x64 --platform=linux  --overwrite --prune --out=build/ --icon=icono.png",
     "dist:win64": "electron-zip-packager  . --arch=x64 --platform=win32  --overwrite --prune --out=build/ --icon=icono.ico",
+    "dist:test": "electron-builder build -w -p never",
     "dist:mac": "electron-packager  . --arch=x64 --platform=mas  --overwrite --prune --out=build/ --icon=icono.icns && electron-installer-zip build/atomplayer-mas-x64/ build/atomplayer-mac-x64.zip",
     "dist": "npm run dist:linux64 && npm run dist:win64 && npm run dist:mac"
   },
   "dependencies": {
-    "electron-is-dev": "^1.0.1",
-    "ffbinaries": "^1.1.0",
-    "first-image-search-load": "^0.4.0",
-    "localized-strings": "^0.2.1",
-    "mkdirp": "^0.5.1",
+    "@getstation/electron-google-oauth2": "^2.1.0",
+    "crypto-js": "^4.0.0",
+    "electron-is-dev": "^1.2.0",
+    "electron-log": "^4.2.2",
+    "electron-store": "^5.2.0",
+    "googleapis": "^52.1.0",
+    "localized-strings": "^0.2.4",
+    "mkdirp": "^1.0.4",
     "nedb": "^1.8.0",
-    "react": "^16.7.0",
-    "react-contextmenu": "^2.10.0",
-    "react-dom": "^16.7.0",
-    "semver": "^6.2.0",
+    "node-fetch": "^2.6.0",
+    "react": "^16.13.1",
+    "react-contextmenu": "^2.14.0",
+    "react-dom": "^16.13.1",
+    "request": "^2.88.2",
+    "semver": "^7.3.2",
     "stream": "0.0.2",
-    "unzipper": "^0.10.1",
-    "vex-js": "^4.1.0",
-    "youtube-mp3-downloader": "^0.5.3",
-    "ytdl-core": "^0.29.3"
+    "unzipper": "^0.10.11",
+    "vex-js": "^4.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.2.3",
-    "@babel/preset-react": "^7.0.0",
-    "babel-loader": "^8.0.4",
-    "electron": "^5.0.6",
-    "electron-builder": "^21.0.15",
+    "@babel/core": "^7.10.3",
+    "@babel/preset-env": "^7.10.3",
+    "@babel/preset-react": "^7.10.1",
+    "babel-loader": "^8.1.0",
+    "electron": "^9.1.0",
+    "electron-builder": "^22.7.0",
     "electron-installer-zip": "^0.1.2",
-    "electron-packager": "^14.0.1",
+    "electron-packager": "^15.0.0",
     "electron-zip-packager": "^4.0.2",
     "webpack": "^4.28.3",
     "webpack-cli": "^3.1.2"
@@ -46,5 +50,33 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/RgtArRr/AtomPlayer.git"
+  },
+  "build": {
+    "appId": "com.atomplayer",
+    "productName": "AtomPlayer",
+    "asar": true,
+    "compression": "maximum",
+    "directories": {
+      "output": "build",
+      "app": "."
+    },
+    "forceCodeSigning": false,
+    "npmRebuild": true,
+    "artifactName": "AtomPlayer-${os}-${arch}.${ext}",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icono.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "deleteAppDataOnUninstall": false
+    }
   }
 }

@@ -35,16 +35,10 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
-
-\.idea/
-resources/db/data\.store
-
-resources/js/settings\.min\.js
-
-resources/js/app\.min\.js
-
-ffmpeg
-
 \.DS_Store
 
+.idea/
+dist/
 build/
+package-lock.json
+report.*.json

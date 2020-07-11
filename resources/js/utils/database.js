@@ -69,8 +69,12 @@ module.exports = function () {
         });
     };
 
-    this.addPlayList = function (name, successCallback) {
-        self.db.insert({type: 'playlist', name: name}, function () {
+    this.addPlayList = function (name, id, successCallback) {
+        let obj = {type: 'playlist', name: name};
+        if (id) {
+            obj._id = id;
+        }
+        self.db.insert(obj, function () {
             successCallback();
         });
     };
@@ -97,10 +101,12 @@ module.exports = function () {
      path:
      name:
      playlist:
+     duration:
+     YtID:
     }]
     */
-    this.addSongs = function (songs) {
-        this.db.insert(songs);
+    this.addSong = function (song) {
+        this.db.insert(song);
     };
 
     this.getSongs = function (playlist, responseCallback) {
@@ -109,7 +115,7 @@ module.exports = function () {
         });
     };
 
-    this.getSongsbySongs = function (_id, responseCallback) {
+    this.getSongsbySong = function (_id, responseCallback) {
         self.getSong(_id, function (song) {
             if (song !== null) {
                 self.getSongs(song.playlist, function (songs) {
@@ -132,9 +138,13 @@ module.exports = function () {
     };
 
     this.deleteSong = function (_id, successCallback) {
-        self.db.remove({_id: _id}, {}, function (err, numRemoved) {
+        self.db.remove({_id: _id}, {}, () => {
             successCallback();
         });
+    };
+
+    this.deleteSongByYtId = function (ytid, playlist) {
+        self.db.remove({YtID: ytid, playlist: playlist}, {});
     };
 
     this.__getSongs = function (_id, type, successCallback) {
@@ -160,6 +170,22 @@ module.exports = function () {
         });
     };
 
+    this.getArraySongs = function (callback) {
+        self.db.find({type: 'playlist'}, (err, playlists) => {
+            let res = [];
+            self.db.find({type: 'song'}, (err, songs) => {
+                playlists.forEach((playlist) => {
+                    res.push({
+                        id: playlist._id,
+                        name: playlist.name,
+                        songs: songs.filter((e) => {return e.playlist === playlist._id;}).map((e) => {return e.YtID;}),
+                    });
+                });
+                callback(res);
+            });
+        });
+    };
+
     this.getNextSong = function (_id, successCallback) {
         this.__getSongs(_id, 'next', successCallback);
     };
@@ -177,23 +203,15 @@ module.exports = function () {
             successCallback();
         });
     };
+    /*
+        this.setConfig = function (key, value) {
+            // this.writeDB('UPDATE config set ' + key + ' = \'' + value + '\'');
+        };
 
-    this.setConfig = function (key, value) {
-        // this.writeDB('UPDATE config set ' + key + ' = \'' + value + '\'');
-    };
+        this.getConfig = function (callback) {
+            this.db.find({type: 'config'}, function (err, docs) {
+                callback(docs);
+            });
+        };*/
 
-    this.getConfig = function (callback) {
-        this.db.find({type: 'config'}, function (err, docs) {
-            callback(docs);
-        });
-    };
-
-    this.getLyrics = function (id_song) {
-        // return this.readDB('SELECT * FROM lyrics where id_cancion=\'' + id_song + '\'');
-    };
-
-    this.setLyrics = function (id_song, url) {
-        // this.writeDB(
-        // 	'INSERT OR REPLACE INTO lyrics(id_cancion, url_lyrics) VALUES(\'' + id_song + '\', \'' + url + '\')');
-    };
 };

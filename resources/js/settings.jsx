@@ -112,7 +112,7 @@ class Settings extends React.Component {
                 </header>
 
                 <div className="window-content">
-                    <h4>{strings.settings_section_1} <span className="icon icon-keyboard"></span></h4>
+                    <h4>{strings.settings_section_1} <span className="icon icon-keyboard"/></h4>
                     <div className="shortcutDiv">
                         <span className="keyboard">F11</span>: {strings.min_max_player}
                     </div>
@@ -132,7 +132,7 @@ class Settings extends React.Component {
 						</span>: {strings.play_song}
                     </div>
 
-                    <h4>{strings.settings_section_2} <span className="icon icon-cog"></span></h4>
+                    <h4>{strings.settings_section_2} <span className="icon icon-cog"/></h4>
                     <div className="shortcutDiv">
 						<span className="keyboard" onClick={this.changeDownloadFolder} style={{width: '300px'}}>
 							{(this.state.folder === null) ? app.getPath('music') : this.state.folder}
@@ -163,7 +163,7 @@ class Settings extends React.Component {
 }
 
 db.init(function () {
-    render((<Settings></Settings>),
+    render((<Settings/>),
         document.getElementById('root'),
     );
 });

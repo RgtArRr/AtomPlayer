@@ -34,6 +34,9 @@ let strings = new LocalizedStrings({
         download_folder: 'Download folder',
         update: 'Update',
         no_updates: 'No update avaliable',
+        is_not_yt_url: 'That isn\'t a Yt url',
+        logout: 'Logout',
+        login_with_google: 'Sign in with Google',
     },
     es: {
         choose_song: 'Escoge una musica',
@@ -65,6 +68,9 @@ let strings = new LocalizedStrings({
         download_folder: 'Carpeta de descargas',
         update: 'Actualizar',
         no_updates: 'No hay actualizaciones disponibles',
+        is_not_yt_url: 'No es una url de YT',
+        logout: 'Salir de la sesion',
+        login_with_google: 'Acceder con Google',
     },
 });
 

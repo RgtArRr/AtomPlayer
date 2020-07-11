@@ -7,7 +7,7 @@ module.exports = {
 	},
 	output: {
 		path: __dirname + '/',
-		filename: './resources/js/[name].min.js',
+		filename: './dist/[name].min.js',
 	},
 	module: {
 		rules: [

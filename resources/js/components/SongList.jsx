@@ -1,4 +1,5 @@
 import React from 'react';
+const ipcRenderer = require('electron').ipcRenderer;
 import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu';
 
 function collect (props) {
@@ -16,7 +17,8 @@ export default class SongList extends React.Component {
 
         this.updateSongs = this.updateSongs.bind(this);
         this.handleClick = this.handleClick.bind(this);
-        this.ondblclickSong = this.ondblclickSong.bind(this );
+        this.ondblclickSong = this.ondblclickSong.bind(this);
+        this.saveToDrive = this.saveToDrive.bind(this);
     }
 
     componentDidMount () {
@@ -25,6 +27,12 @@ export default class SongList extends React.Component {
     }
 
     componentWillUnmount () {
+    }
+
+    saveToDrive () {
+        this.props.db.getArraySongs((res) => {
+            ipcRenderer.sendSync('saveDataToDrive', {data: res});
+        });
     }
 
     updateSongs () {
@@ -47,6 +55,7 @@ export default class SongList extends React.Component {
                     if (value !== false) {
                         self.props.db.changeNameSong(data.data._id, value, function () {
                             self.updateSongs();
+                            self.saveToDrive();
                         });
                     }
                 },
@@ -59,6 +68,7 @@ export default class SongList extends React.Component {
                     if (value) {
                         self.props.db.deleteSong(data.data._id, function () {
                             self.updateSongs();
+                            self.saveToDrive();
                         });
                     }
                 },
