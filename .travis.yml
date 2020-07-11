@@ -8,7 +8,7 @@ sudo: required
 addons:
   apt:
     packages:
-    - wine1.6
+    - wine1.8
 script:
 - npm run react_build
 - npm run dist:test
