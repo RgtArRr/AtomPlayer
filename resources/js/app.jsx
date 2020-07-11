@@ -33,7 +33,7 @@ function MenuBoton (props) {
 class App extends React.Component {
     constructor (props) {
         super(props);
-        this.state = {playlist: null, window: 'home', isLogin: false};
+        this.state = {playlist: null, window: 'home'};
         this.childPlayList = React.createRef();
         this.childSongList = React.createRef();
         this.childPlayer = React.createRef();
